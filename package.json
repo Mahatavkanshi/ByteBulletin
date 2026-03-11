@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sanity": "sanity"
   },
   "dependencies": {
     "@sanity/image-url": "^2.0.3",
+    "@sanity/vision": "^5.14.1",
     "groq": "^5.14.1",
     "next": "16.1.6",
     "next-sanity": "^12.1.1",
