@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categories, getCategoryStories } from "@/lib/news-data";
+import { getCategorySlugs, getNavigationCategories, getStoriesByCategory } from "@/lib/content";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -8,6 +8,7 @@ type CategoryPageProps = {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const categories = await getNavigationCategories();
   const category = categories.find((item) => item.slug === slug);
 
   return {
@@ -15,10 +16,16 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
+export async function generateStaticParams() {
+  const slugs = await getCategorySlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
+  const categories = await getNavigationCategories();
   const category = categories.find((item) => item.slug === slug);
-  const stories = getCategoryStories(slug);
+  const stories = await getStoriesByCategory(slug);
 
   if (!category) {
     return (

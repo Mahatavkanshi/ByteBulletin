@@ -10,6 +10,14 @@ const breakingUpdates = [
 
 export default async function Home() {
   const { featured, latest, trending, categories } = await getHomepageStories();
+  const sectionHighlights = (
+    await Promise.all(
+      categories.slice(0, 6).map(async (category) => {
+        const firstStory = (await getStoriesByCategory(category.slug))[0];
+        return firstStory ? { category, story: firstStory } : null;
+      }),
+    )
+  ).filter((item) => item !== null);
 
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
@@ -95,19 +103,14 @@ export default async function Home() {
           <section>
             <h3 className="mb-4 border-b border-border pb-2 text-2xl">Section Highlights</h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {categories.slice(0, 6).map((category) => {
-                const sectionStory = (await getStoriesByCategory(category.slug))[0];
-                if (!sectionStory) {
-                  return null;
-                }
-
+              {sectionHighlights.map(({ category, story }) => {
                 return (
                   <article key={category.slug} className="rounded-lg border border-border bg-surface p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: category.accent }}>
                       {category.name}
                     </p>
-                    <h4 className="mt-2 text-lg leading-tight">{sectionStory.title}</h4>
-                    <p className="mt-2 text-sm text-muted">{sectionStory.summary}</p>
+                    <h4 className="mt-2 text-lg leading-tight">{story.title}</h4>
+                    <p className="mt-2 text-sm text-muted">{story.summary}</p>
                     <Link href={`/category/${category.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
                       Explore {category.name}
                     </Link>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categories, getRelatedStories, getStoryBySlug } from "@/lib/news-data";
+import { getAllSlugs, getNavigationCategories, getRelated, getStory } from "@/lib/content";
 
 type NewsPageProps = {
   params: Promise<{ slug: string }>;
@@ -8,7 +8,7 @@ type NewsPageProps = {
 
 export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = getStoryBySlug(slug);
+  const article = await getStory(slug);
 
   if (!article) {
     return {
@@ -22,9 +22,14 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
   };
 }
 
+export async function generateStaticParams() {
+  const slugs = await getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export default async function NewsPage({ params }: NewsPageProps) {
   const { slug } = await params;
-  const article = getStoryBySlug(slug);
+  const article = await getStory(slug);
 
   if (!article) {
     return (
@@ -37,8 +42,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
     );
   }
 
+  const categories = await getNavigationCategories();
   const category = categories.find((item) => item.slug === article.category);
-  const relatedStories = getRelatedStories(article.slug, article.category);
+  const relatedStories = await getRelated(article.slug, article.category);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
