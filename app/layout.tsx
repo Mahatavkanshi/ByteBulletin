@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   title: "Byte Bulletin | Clarity in Every Headline",
   description:
     "Byte Bulletin delivers sharp reporting across national affairs, business, technology, sport and opinion.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  openGraph: {
+    title: "Byte Bulletin",
+    description: "Sharp reporting across national, world, business and technology.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
