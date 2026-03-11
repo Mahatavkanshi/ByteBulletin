@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  categories,
-  getCategoryStories,
-  getFeaturedStory,
-  getLatestStories,
-  getTrendingStories,
-} from "@/lib/news-data";
+import { getHomepageStories, getStoriesByCategory } from "@/lib/content";
 
 const breakingUpdates = [
   "Parliament panel seeks stronger digital safety norms for children",
@@ -14,10 +8,8 @@ const breakingUpdates = [
   "University consortium launches open scholarship portal for STEM",
 ];
 
-export default function Home() {
-  const featured = getFeaturedStory();
-  const latest = getLatestStories();
-  const trending = getTrendingStories();
+export default async function Home() {
+  const { featured, latest, trending, categories } = await getHomepageStories();
 
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
@@ -104,7 +96,7 @@ export default function Home() {
             <h3 className="mb-4 border-b border-border pb-2 text-2xl">Section Highlights</h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {categories.slice(0, 6).map((category) => {
-                const sectionStory = getCategoryStories(category.slug)[0];
+                const sectionStory = (await getStoriesByCategory(category.slug))[0];
                 if (!sectionStory) {
                   return null;
                 }
