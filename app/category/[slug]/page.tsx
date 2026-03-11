@@ -1,0 +1,59 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { categories, getCategoryStories } from "@/lib/news-data";
+
+type CategoryPageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const category = categories.find((item) => item.slug === slug);
+
+  return {
+    title: category ? `${category.name} News | Byte Bulletin` : "Category | Byte Bulletin",
+  };
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { slug } = await params;
+  const category = categories.find((item) => item.slug === slug);
+  const stories = getCategoryStories(slug);
+
+  if (!category) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+        <h1 className="text-3xl">Category not found</h1>
+        <Link href="/" className="mt-4 inline-block text-brand hover:underline">
+          Back to home
+        </Link>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="border-b border-border pb-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: category.accent }}>
+          Byte Bulletin Section
+        </p>
+        <h1 className="mt-2 text-4xl">{category.name}</h1>
+      </div>
+
+      <div className="mt-8 grid gap-5">
+        {stories.map((story) => (
+          <article key={story.slug} className="rounded-lg border border-border bg-surface p-5">
+            <h2 className="text-2xl leading-tight">{story.title}</h2>
+            <p className="mt-3 text-[#425668]">{story.summary}</p>
+            <div className="mt-4 text-sm text-muted">
+              {story.author} | {story.location} | {story.publishedAt}
+            </div>
+            <Link href={`/news/${story.slug}`} className="mt-4 inline-block text-sm font-semibold text-brand hover:underline">
+              Read full report
+            </Link>
+          </article>
+        ))}
+      </div>
+    </main>
+  );
+}
