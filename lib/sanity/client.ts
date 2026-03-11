@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createClient } from "next-sanity";
-import imageUrlBuilder from "@sanity/image-url";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 
 export const isSanityConfigured = Boolean(
@@ -14,9 +13,3 @@ export const sanityClient = createClient({
   apiVersion,
   useCdn: true,
 });
-
-const imageBuilder = imageUrlBuilder(sanityClient);
-
-export function urlForImage(source: unknown) {
-  return imageBuilder.image(source);
-}

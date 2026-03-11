@@ -54,8 +54,12 @@ const fetchCmsCategories = cache(async (): Promise<Category[]> => {
     return fallbackCategories;
   }
 
-  const cmsCategories = await sanityClient.fetch<Category[]>(categoriesQuery);
-  return cmsCategories.length > 0 ? cmsCategories : fallbackCategories;
+  try {
+    const cmsCategories = await sanityClient.fetch<Category[]>(categoriesQuery);
+    return cmsCategories.length > 0 ? cmsCategories : fallbackCategories;
+  } catch {
+    return fallbackCategories;
+  }
 });
 
 const fetchCmsArticles = cache(async (): Promise<NewsArticle[]> => {
@@ -63,13 +67,17 @@ const fetchCmsArticles = cache(async (): Promise<NewsArticle[]> => {
     return newsArticles;
   }
 
-  const cmsArticles = await sanityClient.fetch<CmsArticle[]>(allArticlesQuery);
+  try {
+    const cmsArticles = await sanityClient.fetch<CmsArticle[]>(allArticlesQuery);
 
-  if (cmsArticles.length === 0) {
+    if (cmsArticles.length === 0) {
+      return newsArticles;
+    }
+
+    return cmsArticles.map(normalizeArticle);
+  } catch {
     return newsArticles;
   }
-
-  return cmsArticles.map(normalizeArticle);
 });
 
 export async function getNavigationCategories() {
@@ -92,13 +100,16 @@ export async function getStory(slug: string) {
     return getStoryBySlug(slug);
   }
 
-  const cmsArticle = await sanityClient.fetch<CmsArticle | null>(articleBySlugQuery, { slug });
+  try {
+    const cmsArticle = await sanityClient.fetch<CmsArticle | null>(articleBySlugQuery, { slug });
+    if (!cmsArticle) {
+      return getStoryBySlug(slug);
+    }
 
-  if (!cmsArticle) {
+    return normalizeArticle(cmsArticle);
+  } catch {
     return getStoryBySlug(slug);
   }
-
-  return normalizeArticle(cmsArticle);
 }
 
 export async function getStoriesByCategory(slug: string) {
