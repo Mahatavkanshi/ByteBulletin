@@ -24,21 +24,31 @@ type PersonalFeedProps = {
 const categoryStorageKey = "byte-bulletin-followed-categories";
 const topicStorageKey = "byte-bulletin-followed-topics";
 
+function readStoredSelection(key: string) {
+  if (typeof window === "undefined") {
+    return [] as string[];
+  }
+
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]") as string[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [] as string[];
+  }
+}
+
 export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps) {
   const [followedCategories, setFollowedCategories] = useState<string[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>([]);
 
   useEffect(() => {
-    try {
-      const savedCategories = JSON.parse(localStorage.getItem(categoryStorageKey) || "[]") as string[];
-      const savedTopics = JSON.parse(localStorage.getItem(topicStorageKey) || "[]") as string[];
+    const savedCategories = readStoredSelection(categoryStorageKey);
+    const savedTopics = readStoredSelection(topicStorageKey);
 
+    queueMicrotask(() => {
       setFollowedCategories(savedCategories);
       setFollowedTopics(savedTopics);
-    } catch {
-      setFollowedCategories([]);
-      setFollowedTopics([]);
-    }
+    });
   }, []);
 
   function persistSelections(nextCategories: string[], nextTopics: string[]) {

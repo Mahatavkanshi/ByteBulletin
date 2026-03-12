@@ -10,8 +10,8 @@ type ArticleAudioProps = {
 };
 
 export function ArticleAudio({ title, summary, brief, content }: ArticleAudioProps) {
-  const [isSupported, setIsSupported] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const isSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const narration = useMemo(() => {
     const sections = [
@@ -25,8 +25,6 @@ export function ArticleAudio({ title, summary, brief, content }: ArticleAudioPro
   }, [title, summary, brief, content]);
 
   useEffect(() => {
-    setIsSupported(typeof window !== "undefined" && "speechSynthesis" in window);
-
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();

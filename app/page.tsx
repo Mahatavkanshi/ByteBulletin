@@ -62,6 +62,12 @@ export default async function Home() {
                 {category.name}
               </Link>
             ))}
+            <Link href="/fact-check" className="transition hover:text-brand">
+              Fact Check
+            </Link>
+            <Link href="/topics" className="transition hover:text-brand">
+              Topics
+            </Link>
             <Link href="/search" className="transition hover:text-brand">
               Search
             </Link>
@@ -144,6 +150,56 @@ export default async function Home() {
                   ))}
             </div>
           </section>
+
+          <section>
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
+              <h3 className="text-2xl">Fact Check Lane</h3>
+              <Link href="/fact-check" className="text-sm font-semibold text-brand hover:underline">
+                View all checks
+              </Link>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {factChecks.map((check) => (
+                <article key={check.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-full bg-[#1e3242] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ecf5ff]">
+                      {check.verdict}
+                    </span>
+                    <span className="text-xs text-muted">{check.publishedAt}</span>
+                  </div>
+                  <h4 className="mt-2 text-lg leading-tight">{check.title}</h4>
+                  <p className="mt-2 text-sm text-muted">{check.summary}</p>
+                  <p className="mt-2 text-xs text-muted">Claim: {check.claim}</p>
+                  <Link href="/fact-check" className="mt-2 inline-block text-sm font-semibold text-brand hover:underline">
+                    See evidence
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
+              <h3 className="text-2xl">Topic Timelines</h3>
+              <Link href="/topics" className="text-sm font-semibold text-brand hover:underline">
+                Explore topics
+              </Link>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {topicCards.map((topic) => (
+                <article key={topic.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-brand">Ongoing Story</p>
+                  <h4 className="mt-2 text-xl leading-tight">{topic.name}</h4>
+                  <p className="mt-2 text-sm text-muted">{topic.summary}</p>
+                  <Link href={`/topic/${topic.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                    Open timeline
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <PersonalFeed stories={personalizationSeed.stories} categories={personalizationSeed.categories} topics={personalizationSeed.topics} />
 
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
@@ -249,6 +305,36 @@ export default async function Home() {
                   </Link>
                 </article>
               ))}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-surface p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-xl">City Utility</h3>
+              <span className="text-xs text-muted">{utilityWidgets.city}</span>
+            </div>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Weather</p>
+                <p className="mt-1 text-base">
+                  {utilityWidgets.weather.temperatureC}C | {utilityWidgets.weather.condition}
+                </p>
+                <p className="text-xs text-muted">Wind {utilityWidgets.weather.windKph} km/h</p>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Air Quality</p>
+                <p className="mt-1 text-base">AQI {utilityWidgets.airQuality.aqi ?? "--"}</p>
+                <p className="text-xs text-muted">
+                  PM2.5 {utilityWidgets.airQuality.pm25 ?? "--"} | PM10 {utilityWidgets.airQuality.pm10 ?? "--"}
+                </p>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">INR FX</p>
+                <p className="mt-1 text-base">
+                  USD {utilityWidgets.forex.usd ?? "--"} | EUR {utilityWidgets.forex.eur ?? "--"}
+                </p>
+                <p className="text-xs text-muted">Updated {utilityWidgets.updatedAt}</p>
+              </div>
             </div>
           </section>
 

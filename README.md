@@ -56,9 +56,21 @@ The app uses fallback local content if Sanity env values are not set, so it work
 - `/category/[slug]` category index
 - `/search` search index page
 - `/videos` video bulletin page
+- `/fact-check` fact-check lane
+- `/topics` topic timeline index
+- `/topic/[slug]` topic timeline detail
 - `/studio` Sanity Studio
 - `/api/daily-news` cached GNews JSON feed
 - `/api/daily-videos` cached YouTube RSS video feed
+
+## India-First Enhancements
+
+- Context and trust blocks on article pages (`why it matters`, `what changed`, `what next`, source links, last verified).
+- Read-in-60-sec bullet brief and browser audio narration on article pages.
+- Fact-check lane with verdict labels and evidence links.
+- Topic timelines for ongoing stories.
+- Personal feed using localStorage (no login needed).
+- Utility widgets (Delhi weather, AQI, INR forex snapshot).
 
 ## Video Bulletin Setup
 
@@ -67,6 +79,11 @@ The app uses fallback local content if Sanity env values are not set, so it work
 - The homepage and `/videos` page merge these entries with auto-fetched videos from selected channels.
 - Configure RSS channels via `YOUTUBE_NEWS_CHANNEL_IDS` in `.env.local`.
 - Use `/videos?source=dw-news` style filters from the source chips on the page.
+
+## Editorial Schemas Added
+
+- `article` now includes context fields, source links, last verified, 60-sec brief, and optional topic reference.
+- New schemas: `factCheck`, `topic`, `timelineEvent`.
 
 ## Free Growth Checklist
 

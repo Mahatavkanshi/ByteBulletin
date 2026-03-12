@@ -3,7 +3,6 @@ import {
   categories as fallbackCategories,
   factChecks,
   getCategoryStories,
-  getFactChecks,
   getFeaturedStory,
   getFeaturedVideo,
   getLatestVideos,
@@ -34,7 +33,6 @@ import {
   articleBySlugQuery,
   categoriesQuery,
   timelineEventsByTopicQuery,
-  topicBySlugQuery,
 } from "@/lib/sanity/queries";
 import { fetchYouTubeNewsVideos } from "@/lib/youtube-rss";
 
