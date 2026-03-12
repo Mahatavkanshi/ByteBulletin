@@ -88,6 +88,7 @@ export default async function Home() {
     )
   ).filter((item) => item !== null);
   const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
+  const videoDeskBriefs = latestVideos.slice(0, 4);
   const liveUpdateImageFallbacks = [
     "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?auto=format&fit=crop&w=1400&q=80",
@@ -384,6 +385,23 @@ export default async function Home() {
                   <p className="mt-3 text-base text-muted">{featuredVideo.summary}</p>
                   <div className="mt-4 text-sm text-muted">
                     {(featuredVideo.source || "Byte Bulletin") + " | " + featuredVideo.publishedAt}
+                  </div>
+                  <div className="mt-6 rounded-lg border border-border bg-background/70 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Video Desk Snapshot</p>
+                    <div className="mt-3 space-y-3">
+                      {videoDeskBriefs.map((video, index) => (
+                        <article key={`desk-${video.slug}`} className="flex gap-3 border-b border-border pb-3 last:border-none last:pb-0">
+                          <span className="mt-0.5 text-xs font-semibold text-brand">{String(index + 1).padStart(2, "0")}</span>
+                          <div>
+                            <p className="text-base leading-snug">{video.title}</p>
+                            <p className="mt-1 text-xs text-muted">{(video.source || "Byte Bulletin") + " | " + video.publishedAt}</p>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                    <Link href="/videos" className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                      Open full video hub
+                    </Link>
                   </div>
                 </div>
               </article>
