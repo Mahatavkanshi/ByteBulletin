@@ -15,7 +15,7 @@ const bodyFont = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
-  title: "Byte Bulletin | Clarity in Every Headline",
+  title: "Byte Bulletin | News That Matters",
   description:
     "Byte Bulletin delivers sharp reporting across national affairs, business, technology, sport and opinion.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),

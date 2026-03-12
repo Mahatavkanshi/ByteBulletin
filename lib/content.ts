@@ -1,16 +1,28 @@
 import { cache } from "react";
 import {
   categories as fallbackCategories,
+  getFeaturedVideo,
+  getLatestVideos,
   getCategoryStories,
   getFeaturedStory,
   getRelatedStories,
   getStoryBySlug,
   newsArticles,
+  videoStories,
   type Category,
   type NewsArticle,
+  type VideoStory,
 } from "@/lib/news-data";
+import { fetchGNewsHeadlines } from "@/lib/gnews";
 import { isSanityConfigured, sanityClient } from "@/lib/sanity/client";
-import { allArticlesQuery, articleBySlugQuery, categoriesQuery } from "@/lib/sanity/queries";
+import { allArticlesQuery, allVideosQuery, articleBySlugQuery, categoriesQuery } from "@/lib/sanity/queries";
+
+const fallbackBreakingUpdates = [
+  "Parliament panel seeks stronger digital safety norms for children",
+  "Monsoon outlook revised upward for eastern coastal districts",
+  "Global crude eases after shipping routes stabilise this week",
+  "University consortium launches open scholarship portal for STEM",
+];
 
 type PortableBlock = {
   children?: Array<{ text?: string }>;
@@ -19,6 +31,10 @@ type PortableBlock = {
 type CmsArticle = Omit<NewsArticle, "publishedAt" | "content"> & {
   publishedAt: string;
   body?: PortableBlock[];
+};
+
+type CmsVideo = Omit<VideoStory, "publishedAt"> & {
+  publishedAt: string;
 };
 
 function toParagraphs(blocks: PortableBlock[] | undefined, summary: string) {
@@ -46,6 +62,13 @@ function normalizeArticle(article: CmsArticle): NewsArticle {
     ...article,
     publishedAt: formatPublishDate(article.publishedAt),
     content: toParagraphs(article.body, article.summary),
+  };
+}
+
+function normalizeVideo(video: CmsVideo): VideoStory {
+  return {
+    ...video,
+    publishedAt: formatPublishDate(video.publishedAt),
   };
 }
 
@@ -80,18 +103,49 @@ const fetchCmsArticles = cache(async (): Promise<NewsArticle[]> => {
   }
 });
 
+const fetchCmsVideos = cache(async (): Promise<VideoStory[]> => {
+  if (!isSanityConfigured) {
+    return videoStories;
+  }
+
+  try {
+    const cmsVideos = await sanityClient.fetch<CmsVideo[]>(allVideosQuery);
+
+    if (cmsVideos.length === 0) {
+      return videoStories;
+    }
+
+    return cmsVideos.map(normalizeVideo);
+  } catch {
+    return videoStories;
+  }
+});
+
 export async function getNavigationCategories() {
   return fetchCmsCategories();
 }
 
 export async function getHomepageStories() {
   const stories = await fetchCmsArticles();
+  const liveUpdates = await fetchGNewsHeadlines(6);
+  const breaking = liveUpdates.length > 0 ? liveUpdates.map((item) => item.title) : fallbackBreakingUpdates;
 
   return {
     featured: stories.find((story) => story.featured) ?? stories[0] ?? getFeaturedStory(),
     latest: stories.slice(0, 5),
     trending: stories.filter((story) => story.trending).slice(0, 4),
     categories: await fetchCmsCategories(),
+    liveUpdates,
+    breaking,
+  };
+}
+
+export async function getHomepageVideos() {
+  const videos = await fetchCmsVideos();
+
+  return {
+    featuredVideo: videos.find((video) => video.featured) ?? videos[0] ?? getFeaturedVideo(),
+    latestVideos: videos.slice(0, 3),
   };
 }
 
@@ -126,6 +180,11 @@ export async function getRelated(slug: string, category: string) {
 
 export async function getSearchStories() {
   return fetchCmsArticles();
+}
+
+export async function getVideoStories() {
+  const videos = await fetchCmsVideos();
+  return videos.length > 0 ? videos : getLatestVideos(6);
 }
 
 export async function getAllSlugs() {

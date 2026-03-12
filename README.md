@@ -41,6 +41,7 @@ Open `http://localhost:3000`.
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
+GNEWS_API_KEY=your_gnews_api_key
 ```
 
 4. Open Studio at `http://localhost:3000/studio`.
@@ -54,6 +55,7 @@ The app uses fallback local content if Sanity env values are not set, so it work
 - `/category/[slug]` category index
 - `/search` search index page
 - `/studio` Sanity Studio
+- `/api/daily-news` cached GNews JSON feed
 
 ## Free Growth Checklist
 

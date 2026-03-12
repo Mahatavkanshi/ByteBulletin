@@ -18,6 +18,16 @@ export type NewsArticle = {
   content: string[];
 };
 
+export type VideoStory = {
+  title: string;
+  slug: string;
+  summary: string;
+  youtubeUrl: string;
+  category: string;
+  publishedAt: string;
+  featured?: boolean;
+};
+
 export const categories: Category[] = [
   { name: "National", slug: "national", accent: "#8b1f1f" },
   { name: "World", slug: "world", accent: "#123f6b" },
@@ -130,6 +140,34 @@ export const newsArticles: NewsArticle[] = [
   },
 ];
 
+export const videoStories: VideoStory[] = [
+  {
+    title: "Budget 2026 explained in 7 minutes",
+    slug: "budget-2026-explained",
+    summary: "A quick visual breakdown of tax changes, rural allocation and infra spending.",
+    youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+    category: "business",
+    publishedAt: "Mar 12, 2026",
+    featured: true,
+  },
+  {
+    title: "How India is preparing for the summer heatwave",
+    slug: "india-heatwave-preparedness",
+    summary: "Ground report on city cooling plans, shelters and district emergency readiness.",
+    youtubeUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    category: "national",
+    publishedAt: "Mar 11, 2026",
+  },
+  {
+    title: "AI chips and the new global supply map",
+    slug: "ai-chips-global-supply-map",
+    summary: "An explainer on fabrication hubs, logistics bottlenecks and policy competition.",
+    youtubeUrl: "https://www.youtube.com/watch?v=kXYiU_JCYtU",
+    category: "technology",
+    publishedAt: "Mar 10, 2026",
+  },
+];
+
 export function getFeaturedStory() {
   return newsArticles.find((article) => article.featured) ?? newsArticles[0];
 }
@@ -154,4 +192,12 @@ export function getRelatedStories(slug: string, category: string) {
   return newsArticles
     .filter((article) => article.slug !== slug && article.category === category)
     .slice(0, 3);
+}
+
+export function getFeaturedVideo() {
+  return videoStories.find((video) => video.featured) ?? videoStories[0];
+}
+
+export function getLatestVideos(limit = 3) {
+  return videoStories.slice(0, limit);
 }

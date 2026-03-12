@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { getHomepageStories, getStoriesByCategory } from "@/lib/content";
-
-const breakingUpdates = [
-  "Parliament panel seeks stronger digital safety norms for children",
-  "Monsoon outlook revised upward for eastern coastal districts",
-  "Global crude eases after shipping routes stabilise this week",
-  "University consortium launches open scholarship portal for STEM",
-];
+import { getHomepageStories, getHomepageVideos, getStoriesByCategory } from "@/lib/content";
+import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/video-utils";
 
 export default async function Home() {
-  const { featured, latest, trending, categories } = await getHomepageStories();
+  const [{ featured, latest, trending, categories, liveUpdates, breaking }, { featuredVideo, latestVideos }] =
+    await Promise.all([getHomepageStories(), getHomepageVideos()]);
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
   const sectionHighlights = (
     await Promise.all(
       categories.slice(0, 6).map(async (category) => {
@@ -18,6 +19,7 @@ export default async function Home() {
       }),
     )
   ).filter((item) => item !== null);
+  const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
 
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
@@ -26,9 +28,9 @@ export default async function Home() {
           <div className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
             <div>
               <p className="text-xs font-semibold tracking-[0.2em] text-brand">BYTE BULLETIN</p>
-              <h1 className="mt-1 text-4xl leading-none sm:text-5xl">Clarity in Every Headline</h1>
+              <h1 className="mt-1 text-4xl leading-none sm:text-5xl">News That Matters</h1>
             </div>
-            <p className="text-sm text-muted">Wednesday, March 11, 2026</p>
+            <p className="text-sm text-muted">{today}</p>
           </div>
 
           <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold uppercase tracking-wide text-[#33475b]">
@@ -40,6 +42,9 @@ export default async function Home() {
             <Link href="/search" className="transition hover:text-brand">
               Search
             </Link>
+            <Link href="/videos" className="transition hover:text-brand">
+              Videos
+            </Link>
           </nav>
         </div>
       </header>
@@ -49,7 +54,7 @@ export default async function Home() {
           <span className="rounded bg-brand-soft px-2 py-1 text-brand">Breaking</span>
           <div className="relative w-full overflow-hidden">
             <div className="ticker-track flex w-[200%] gap-8 whitespace-nowrap">
-              {[...breakingUpdates, ...breakingUpdates].map((item, index) => (
+              {[...breaking, ...breaking].map((item, index) => (
                 <span key={`${item}-${index}`}>{item}</span>
               ))}
             </div>
@@ -86,17 +91,97 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              {latest.map((story) => (
-                <article key={story.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-brand">{story.category}</p>
-                  <h4 className="mt-2 text-xl leading-tight">{story.title}</h4>
-                  <p className="mt-2 text-sm text-muted">{story.summary}</p>
-                  <div className="mt-3 text-xs text-muted">{story.readTime}</div>
-                  <Link href={`/news/${story.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
-                    Continue reading
-                  </Link>
-                </article>
-              ))}
+              {liveUpdates.length > 0
+                ? liveUpdates.map((update) => (
+                    <article key={update.url} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-brand">Daily Wire</p>
+                      <h4 className="mt-2 text-xl leading-tight">{update.title}</h4>
+                      <p className="mt-2 text-sm text-muted">{update.description || "Read the full update from the source."}</p>
+                      <div className="mt-3 text-xs text-muted">{update.publishedAt || "Updated recently"}</div>
+                      <a
+                        href={update.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
+                      >
+                        Read full update
+                      </a>
+                    </article>
+                  ))
+                : latest.map((story) => (
+                    <article key={story.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-brand">{story.category}</p>
+                      <h4 className="mt-2 text-xl leading-tight">{story.title}</h4>
+                      <p className="mt-2 text-sm text-muted">{story.summary}</p>
+                      <div className="mt-3 text-xs text-muted">{story.readTime}</div>
+                      <Link href={`/news/${story.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                        Continue reading
+                      </Link>
+                    </article>
+                  ))}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
+              <h3 className="text-2xl">Video Bulletin</h3>
+              <Link href="/videos" className="text-sm font-semibold text-brand hover:underline">
+                Watch all
+              </Link>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+              <article className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+                <div className="aspect-video bg-[#1e3242]">
+                  {featuredVideoEmbed ? (
+                    <iframe
+                      src={featuredVideoEmbed}
+                      title={featuredVideo.title}
+                      className="h-full w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm font-semibold text-[#ecf5ff]">
+                      Video unavailable
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 sm:p-5">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-brand">Featured Video</p>
+                  <h4 className="mt-2 text-2xl leading-tight">{featuredVideo.title}</h4>
+                  <p className="mt-2 text-sm text-muted">{featuredVideo.summary}</p>
+                  <div className="mt-3 text-xs text-muted">{featuredVideo.publishedAt}</div>
+                </div>
+              </article>
+
+              <div className="space-y-4">
+                {latestVideos.slice(0, 3).map((video) => {
+                  const thumbnail = getYoutubeThumbnailUrl(video.youtubeUrl);
+                  return (
+                    <a
+                      key={video.slug}
+                      href={video.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group block rounded-lg border border-border bg-surface p-3 transition hover:shadow-sm"
+                    >
+                      <div className="relative aspect-video overflow-hidden rounded-md bg-[#dae5ef]">
+                        {thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={thumbnail} alt={video.title} className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs font-semibold text-[#3f5567]">No preview</div>
+                        )}
+                        <span className="absolute bottom-2 left-2 rounded bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
+                          Play
+                        </span>
+                      </div>
+                      <h4 className="mt-2 text-base leading-snug">{video.title}</h4>
+                      <p className="mt-1 text-xs text-muted">{video.publishedAt}</p>
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </section>
 

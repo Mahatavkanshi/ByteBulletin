@@ -41,3 +41,15 @@ export const articleBySlugQuery = groq`
     body
   }
 `;
+
+export const allVideosQuery = groq`
+  *[_type == "videoStory"] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    summary,
+    youtubeUrl,
+    "category": category->slug.current,
+    publishedAt,
+    featured
+  }
+`;
