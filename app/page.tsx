@@ -7,6 +7,7 @@ import {
   getStoriesByCategory,
   getTopicCardsData,
 } from "@/lib/content";
+import { resolveStoryImage } from "@/lib/news-data";
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/video-utils";
 import { getUtilityWidgets } from "@/lib/widgets";
 
@@ -39,6 +40,14 @@ export default async function Home() {
     )
   ).filter((item) => item !== null);
   const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
+  const liveUpdateImageFallbacks = [
+    "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1516387938699-a93567ec168e?auto=format&fit=crop&w=1400&q=80",
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
@@ -93,6 +102,16 @@ export default async function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Lead Story</p>
             <h2 className="mt-3 text-3xl leading-tight sm:text-4xl">{featured.title}</h2>
             <p className="mt-4 max-w-3xl text-lg text-[#425668]">{featured.summary}</p>
+            <div className="relative mt-5 aspect-[16/9] overflow-hidden rounded-xl border border-border">
+              <Image
+                src={resolveStoryImage(featured)}
+                alt={featured.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 900px"
+                className="object-cover"
+                priority
+              />
+            </div>
             <div className="mt-5 flex flex-wrap gap-3 text-sm text-muted">
               <span>{featured.author}</span>
               <span>|</span>
@@ -117,9 +136,18 @@ export default async function Home() {
             </div>
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-2">
               {liveUpdates.length > 0
-                ? liveUpdates.map((update) => (
+                ? liveUpdates.map((update, index) => (
                     <article key={update.url} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">Daily Wire</p>
+                      <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border">
+                        <Image
+                          src={liveUpdateImageFallbacks[index % liveUpdateImageFallbacks.length]}
+                          alt={update.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 48vw"
+                          className="object-cover"
+                        />
+                      </div>
                       <h4 className="mt-2 text-2xl leading-tight">{update.title}</h4>
                       <p className="mt-3 text-base text-muted">{update.description || "Read the full update from the source."}</p>
                       <div className="mt-4 text-sm text-muted">{update.publishedAt || "Updated recently"}</div>
@@ -136,6 +164,15 @@ export default async function Home() {
                 : latest.map((story) => (
                     <article key={story.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">{story.category}</p>
+                      <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border">
+                        <Image
+                          src={resolveStoryImage(story)}
+                          alt={story.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 48vw"
+                          className="object-cover"
+                        />
+                      </div>
                       <h4 className="mt-2 text-2xl leading-tight">{story.title}</h4>
                       <p className="mt-3 text-base text-muted">{story.summary}</p>
                       <div className="mt-4 text-sm text-muted">{story.readTime}</div>
@@ -273,6 +310,15 @@ export default async function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: category.accent }}>
                       {category.name}
                     </p>
+                    <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border">
+                      <Image
+                        src={resolveStoryImage(story)}
+                        alt={story.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                     <h4 className="mt-2 text-2xl leading-tight">{story.title}</h4>
                     <p className="mt-3 text-base text-muted">{story.summary}</p>
                     <Link href={`/category/${category.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArticleAudio } from "@/components/article-audio";
 import { getAllSlugs, getNavigationCategories, getRelated, getStory } from "@/lib/content";
+import { resolveStoryImage } from "@/lib/news-data";
 
 type NewsPageProps = {
   params: Promise<{ slug: string }>;
@@ -76,7 +78,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </Link>
           ) : null}
 
-          <div className="mt-8 h-72 rounded-xl border border-border bg-gradient-to-br from-[#f7dfdb] via-[#f5ede3] to-[#dce9f5]" />
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-xl border border-border">
+            <Image src={resolveStoryImage(article)} alt={article.title} fill sizes="(max-width: 1024px) 100vw, 900px" className="object-cover" />
+          </div>
 
           <section className="mt-10 rounded-xl border border-border bg-surface p-6 sm:p-7">
             <div className="flex flex-wrap items-center justify-between gap-2">

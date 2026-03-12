@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getCategorySlugs, getNavigationCategories, getStoriesByCategory } from "@/lib/content";
+import { resolveStoryImage } from "@/lib/news-data";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -49,8 +51,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <div className="mt-8 grid gap-5">
         {stories.map((story) => (
-          <article key={story.slug} className="rounded-lg border border-border bg-surface p-5">
-            <h2 className="text-2xl leading-tight">{story.title}</h2>
+          <article key={story.slug} className="rounded-lg border border-border bg-surface p-5 shadow-sm">
+            <div className="relative aspect-[16/8] overflow-hidden rounded-lg border border-border">
+              <Image src={resolveStoryImage(story)} alt={story.title} fill sizes="(max-width: 1280px) 100vw, 900px" className="object-cover" />
+            </div>
+            <h2 className="mt-4 text-2xl leading-tight">{story.title}</h2>
             <p className="mt-3 text-[#425668]">{story.summary}</p>
             <div className="mt-4 text-sm text-muted">
               {story.author} | {story.location} | {story.publishedAt}

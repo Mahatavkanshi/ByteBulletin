@@ -30,7 +30,7 @@ export const allArticlesQuery = groq`
     sixtySecondBrief,
     sourceLinks[]{label, url},
     lastVerified,
-    coverImage,
+    "coverImageUrl": coverImage.asset->url,
     body
   }
 `;
@@ -57,7 +57,7 @@ export const articleBySlugQuery = groq`
     sixtySecondBrief,
     sourceLinks[]{label, url},
     lastVerified,
-    coverImage,
+    "coverImageUrl": coverImage.asset->url,
     body
   }
 `;

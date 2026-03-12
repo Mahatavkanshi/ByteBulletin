@@ -18,6 +18,7 @@ export type NewsArticle = {
   title: string;
   slug: string;
   summary: string;
+  coverImageUrl?: string;
   category: string;
   author: string;
   location: string;
@@ -106,6 +107,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "metro-corridors-expand-affordable-pass",
     summary:
       "The transport authority announces a two-tier monthly pass that lowers costs for regular commuters and students.",
+    coverImageUrl: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80",
     category: "national",
     author: "Ananya Menon",
     location: "Chennai",
@@ -147,6 +149,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "india-asean-resilient-supply-chains",
     summary:
       "Trade delegates focus on semiconductors, pharmaceuticals and logistics corridors at the annual dialogue summit.",
+    coverImageUrl: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1600&q=80",
     category: "world",
     author: "Ritika Suri",
     location: "New Delhi",
@@ -183,6 +186,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "small-manufacturers-ai-forecasting-tools",
     summary:
       "Pilot programs in Coimbatore and Pune show improved demand planning and lower warehousing costs.",
+    coverImageUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80",
     category: "business",
     author: "Nikhil Jain",
     location: "Mumbai",
@@ -206,6 +210,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "open-source-language-model-lower-cost-ai-apps",
     summary:
       "Developers report faster experimentation cycles as community-built models challenge closed ecosystems.",
+    coverImageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80",
     category: "technology",
     author: "Farah Ali",
     location: "Bengaluru",
@@ -223,6 +228,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "womens-league-final-record-attendance",
     summary:
       "Clubs credit school-level partnerships and local coaching camps for the sharp rise in participation.",
+    coverImageUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=80",
     category: "sport",
     author: "Dev Kapoor",
     location: "Kolkata",
@@ -239,6 +245,7 @@ export const newsArticles: NewsArticle[] = [
     slug: "why-cities-need-climate-budgets",
     summary:
       "Urban resilience requires transparent spending plans tied to flood maps, heat data and public health indicators.",
+    coverImageUrl: "https://images.unsplash.com/photo-1470163395405-d2b80e7450ed?auto=format&fit=crop&w=1600&q=80",
     category: "opinion",
     author: "Editorial Board",
     location: "Byte Bulletin Desk",
@@ -370,6 +377,19 @@ const defaultVideoStory: VideoStory = {
   category: "world",
   publishedAt: "Mar 12, 2026",
 };
+
+const categoryImageFallbacks: Record<string, string> = {
+  national: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80",
+  world: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1600&q=80",
+  business: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80",
+  technology: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80",
+  sport: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=80",
+  opinion: "https://images.unsplash.com/photo-1470163395405-d2b80e7450ed?auto=format&fit=crop&w=1600&q=80",
+};
+
+export function resolveStoryImage(article: Pick<NewsArticle, "coverImageUrl" | "category">) {
+  return article.coverImageUrl || categoryImageFallbacks[article.category] || categoryImageFallbacks.national;
+}
 
 export function getFeaturedStory() {
   return newsArticles.find((article) => article.featured) ?? newsArticles[0];
