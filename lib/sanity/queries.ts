@@ -20,6 +20,16 @@ export const allArticlesQuery = groq`
     readTime,
     featured,
     trending,
+    "topic": topic->{
+      name,
+      "slug": slug.current
+    },
+    whyItMatters,
+    whatChanged,
+    whatNext,
+    sixtySecondBrief,
+    sourceLinks[]{label, url},
+    lastVerified,
     coverImage,
     body
   }
@@ -37,6 +47,16 @@ export const articleBySlugQuery = groq`
     readTime,
     featured,
     trending,
+    "topic": topic->{
+      name,
+      "slug": slug.current
+    },
+    whyItMatters,
+    whatChanged,
+    whatNext,
+    sixtySecondBrief,
+    sourceLinks[]{label, url},
+    lastVerified,
     coverImage,
     body
   }
@@ -52,5 +72,46 @@ export const allVideosQuery = groq`
     "category": category->slug.current,
     publishedAt,
     featured
+  }
+`;
+
+export const allFactChecksQuery = groq`
+  *[_type == "factCheck"] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    claim,
+    verdict,
+    summary,
+    explanation,
+    region,
+    publishedAt,
+    evidence[]{label, url}
+  }
+`;
+
+export const allTopicsQuery = groq`
+  *[_type == "topic"] | order(name asc) {
+    name,
+    "slug": slug.current,
+    summary
+  }
+`;
+
+export const topicBySlugQuery = groq`
+  *[_type == "topic" && slug.current == $slug][0] {
+    name,
+    "slug": slug.current,
+    summary
+  }
+`;
+
+export const timelineEventsByTopicQuery = groq`
+  *[_type == "timelineEvent" && topic->slug.current == $slug] | order(eventAt desc) {
+    title,
+    "slug": slug.current,
+    "topicSlug": topic->slug.current,
+    update,
+    eventAt,
+    sourceLinks[]{label, url}
   }
 `;

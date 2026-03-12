@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArticleAudio } from "@/components/article-audio";
 import { getAllSlugs, getNavigationCategories, getRelated, getStory } from "@/lib/content";
 
 type NewsPageProps = {
@@ -45,6 +46,11 @@ export default async function NewsPage({ params }: NewsPageProps) {
   const categories = await getNavigationCategories();
   const category = categories.find((item) => item.slug === article.category);
   const relatedStories = await getRelated(article.slug, article.category);
+  const whyItMatters = article.whyItMatters ?? [];
+  const whatChanged = article.whatChanged ?? [];
+  const whatNext = article.whatNext ?? [];
+  const quickBrief = article.sixtySecondBrief ?? [];
+  const sourceLinks = article.sourceLinks ?? [];
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -64,8 +70,72 @@ export default async function NewsPage({ params }: NewsPageProps) {
             <span>|</span>
             <span>{article.readTime}</span>
           </div>
+          {article.topic ? (
+            <Link href={`/topic/${article.topic.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+              Follow timeline: {article.topic.name}
+            </Link>
+          ) : null}
 
           <div className="mt-7 h-64 rounded-xl border border-border bg-gradient-to-br from-[#f7dfdb] via-[#f5ede3] to-[#dce9f5]" />
+
+          <section className="mt-8 rounded-xl border border-border bg-surface p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-2xl">Context and Trust</h2>
+              <span className="text-xs text-muted">{article.lastVerified || "Verification in progress"}</span>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Why it matters</p>
+                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                  {whyItMatters.length > 0 ? whyItMatters.map((point) => <li key={point}>- {point}</li>) : <li>- Context update will be added by the desk.</li>}
+                </ul>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">What changed</p>
+                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                  {whatChanged.length > 0 ? whatChanged.map((point) => <li key={point}>- {point}</li>) : <li>- New developments are being tracked.</li>}
+                </ul>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">What next</p>
+                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                  {whatNext.length > 0 ? whatNext.map((point) => <li key={point}>- {point}</li>) : <li>- Follow this story for official updates.</li>}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-[1.4fr_1fr]">
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Read in 60 sec</p>
+                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                  {quickBrief.length > 0 ? quickBrief.map((point) => <li key={point}>- {point}</li>) : <li>- Brief points will be published shortly.</li>}
+                </ul>
+                <div className="mt-3">
+                  <ArticleAudio title={article.title} summary={article.summary} brief={quickBrief} content={article.content} />
+                </div>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Sources</p>
+                <div className="mt-2 space-y-1 text-sm">
+                  {sourceLinks.length > 0 ? (
+                    sourceLinks.map((source) => (
+                      <a
+                        key={source.url}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block font-semibold text-brand hover:underline"
+                      >
+                        {source.label}
+                      </a>
+                    ))
+                  ) : (
+                    <p className="text-muted">Primary references will appear after editorial verification.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
 
           <div className="mt-8 space-y-5 text-lg leading-relaxed text-[#213242]">
             {article.content.map((paragraph) => (

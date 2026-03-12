@@ -1,22 +1,42 @@
 import { cache } from "react";
 import {
   categories as fallbackCategories,
+  factChecks,
+  getCategoryStories,
+  getFactChecks,
+  getFeaturedStory,
   getFeaturedVideo,
   getLatestVideos,
-  getCategoryStories,
-  getFeaturedStory,
   getRelatedStories,
   getStoryBySlug,
+  getTopicBySlug,
+  getTopicCards,
+  getTopicTimeline,
   newsArticles,
+  timelineEvents,
+  topics,
   videoStories,
   type Category,
+  type FactCheckItem,
   type NewsArticle,
+  type SourceLink,
+  type TimelineEvent,
+  type Topic,
   type VideoStory,
 } from "@/lib/news-data";
 import { fetchGNewsHeadlines } from "@/lib/gnews";
-import { fetchYouTubeNewsVideos } from "@/lib/youtube-rss";
 import { isSanityConfigured, sanityClient } from "@/lib/sanity/client";
-import { allArticlesQuery, allVideosQuery, articleBySlugQuery, categoriesQuery } from "@/lib/sanity/queries";
+import {
+  allArticlesQuery,
+  allFactChecksQuery,
+  allTopicsQuery,
+  allVideosQuery,
+  articleBySlugQuery,
+  categoriesQuery,
+  timelineEventsByTopicQuery,
+  topicBySlugQuery,
+} from "@/lib/sanity/queries";
+import { fetchYouTubeNewsVideos } from "@/lib/youtube-rss";
 
 const fallbackBreakingUpdates = [
   "Parliament panel seeks stronger digital safety norms for children",
@@ -29,13 +49,24 @@ type PortableBlock = {
   children?: Array<{ text?: string }>;
 };
 
-type CmsArticle = Omit<NewsArticle, "publishedAt" | "content"> & {
+type CmsArticle = Omit<NewsArticle, "publishedAt" | "content" | "lastVerified"> & {
   publishedAt: string;
+  lastVerified?: string;
   body?: PortableBlock[];
 };
 
 type CmsVideo = Omit<VideoStory, "publishedAt"> & {
   publishedAt: string;
+};
+
+type CmsFactCheck = Omit<FactCheckItem, "publishedAt"> & {
+  publishedAt: string;
+};
+
+type CmsTopic = Topic;
+
+type CmsTimelineEvent = Omit<TimelineEvent, "eventAt"> & {
+  eventAt: string;
 };
 
 function toParagraphs(blocks: PortableBlock[] | undefined, summary: string) {
@@ -50,18 +81,83 @@ function toParagraphs(blocks: PortableBlock[] | undefined, summary: string) {
   return paragraphs.length > 0 ? paragraphs : [summary];
 }
 
+function toTextList(list: unknown): string[] {
+  if (!Array.isArray(list)) {
+    return [];
+  }
+
+  return list.map((value) => (typeof value === "string" ? value.trim() : "")).filter(Boolean);
+}
+
+function normalizeLinks(links: unknown): SourceLink[] {
+  if (!Array.isArray(links)) {
+    return [];
+  }
+
+  return links
+    .map((link) => {
+      if (!link || typeof link !== "object") {
+        return null;
+      }
+
+      const { label, url } = link as { label?: string; url?: string };
+      if (!label || !url) {
+        return null;
+      }
+
+      return { label: label.trim(), url: url.trim() };
+    })
+    .filter((link): link is SourceLink => Boolean(link));
+}
+
 function formatPublishDate(value: string) {
-  return new Date(value).toLocaleDateString("en-IN", {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("en-IN", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 }
 
+function formatDateTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const datePart = date.toLocaleDateString("en-IN", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  });
+
+  const timePart = date.toLocaleTimeString("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
+
+  return `${datePart}, ${timePart} IST`;
+}
+
 function normalizeArticle(article: CmsArticle): NewsArticle {
   return {
     ...article,
     publishedAt: formatPublishDate(article.publishedAt),
+    lastVerified: article.lastVerified ? formatDateTime(article.lastVerified) : undefined,
+    whyItMatters: toTextList(article.whyItMatters),
+    whatChanged: toTextList(article.whatChanged),
+    whatNext: toTextList(article.whatNext),
+    sixtySecondBrief: toTextList(article.sixtySecondBrief),
+    sourceLinks: normalizeLinks(article.sourceLinks),
     content: toParagraphs(article.body, article.summary),
   };
 }
@@ -71,6 +167,22 @@ function normalizeVideo(video: CmsVideo): VideoStory {
     ...video,
     source: video.source?.trim() || "Byte Bulletin",
     publishedAt: formatPublishDate(video.publishedAt),
+  };
+}
+
+function normalizeFactCheck(factCheck: CmsFactCheck): FactCheckItem {
+  return {
+    ...factCheck,
+    publishedAt: formatPublishDate(factCheck.publishedAt),
+    evidence: normalizeLinks(factCheck.evidence),
+  };
+}
+
+function normalizeTimelineEvent(event: CmsTimelineEvent): TimelineEvent {
+  return {
+    ...event,
+    sourceLinks: normalizeLinks(event.sourceLinks),
+    eventAt: formatDateTime(event.eventAt),
   };
 }
 
@@ -108,12 +220,7 @@ const fetchCmsArticles = cache(async (): Promise<NewsArticle[]> => {
 
   try {
     const cmsArticles = await sanityClient.fetch<CmsArticle[]>(allArticlesQuery);
-
-    if (cmsArticles.length === 0) {
-      return newsArticles;
-    }
-
-    return cmsArticles.map(normalizeArticle);
+    return cmsArticles.length > 0 ? cmsArticles.map(normalizeArticle) : newsArticles;
   } catch {
     return newsArticles;
   }
@@ -126,14 +233,48 @@ const fetchCmsVideos = cache(async (): Promise<VideoStory[]> => {
 
   try {
     const cmsVideos = await sanityClient.fetch<CmsVideo[]>(allVideosQuery);
-
-    if (cmsVideos.length === 0) {
-      return videoStories;
-    }
-
-    return cmsVideos.map(normalizeVideo);
+    return cmsVideos.length > 0 ? cmsVideos.map(normalizeVideo) : videoStories;
   } catch {
     return videoStories;
+  }
+});
+
+const fetchCmsFactChecks = cache(async (): Promise<FactCheckItem[]> => {
+  if (!isSanityConfigured) {
+    return factChecks;
+  }
+
+  try {
+    const cmsFactChecks = await sanityClient.fetch<CmsFactCheck[]>(allFactChecksQuery);
+    return cmsFactChecks.length > 0 ? cmsFactChecks.map(normalizeFactCheck) : factChecks;
+  } catch {
+    return factChecks;
+  }
+});
+
+const fetchCmsTopics = cache(async (): Promise<Topic[]> => {
+  if (!isSanityConfigured) {
+    return topics;
+  }
+
+  try {
+    const cmsTopics = await sanityClient.fetch<CmsTopic[]>(allTopicsQuery);
+    return cmsTopics.length > 0 ? cmsTopics : topics;
+  } catch {
+    return topics;
+  }
+});
+
+const fetchCmsTimelineByTopic = cache(async (slug: string): Promise<TimelineEvent[]> => {
+  if (!isSanityConfigured) {
+    return getTopicTimeline(slug);
+  }
+
+  try {
+    const cmsTimeline = await sanityClient.fetch<CmsTimelineEvent[]>(timelineEventsByTopicQuery, { slug });
+    return cmsTimeline.length > 0 ? cmsTimeline.map(normalizeTimelineEvent) : getTopicTimeline(slug);
+  } catch {
+    return getTopicTimeline(slug);
   }
 });
 
@@ -175,11 +316,7 @@ export async function getStory(slug: string) {
 
   try {
     const cmsArticle = await sanityClient.fetch<CmsArticle | null>(articleBySlugQuery, { slug });
-    if (!cmsArticle) {
-      return getStoryBySlug(slug);
-    }
-
-    return normalizeArticle(cmsArticle);
+    return cmsArticle ? normalizeArticle(cmsArticle) : getStoryBySlug(slug);
   } catch {
     return getStoryBySlug(slug);
   }
@@ -204,12 +341,48 @@ export async function getSearchStories() {
 export async function getVideoStories() {
   const [cmsVideos, autoVideos] = await Promise.all([fetchCmsVideos(), fetchYouTubeNewsVideos(20)]);
   const merged = uniqueVideos([...autoVideos, ...cmsVideos]);
+  return merged.length > 0 ? merged : getLatestVideos(6);
+}
 
-  if (merged.length > 0) {
-    return merged;
+export async function getFactCheckStories(limit = 5) {
+  const checks = await fetchCmsFactChecks();
+  return checks.slice(0, limit);
+}
+
+export async function getTopicCardsData(limit = 6) {
+  const topicCards = await fetchCmsTopics();
+  return topicCards.slice(0, limit);
+}
+
+export async function getTopicPageData(slug: string) {
+  const [topicCards, timeline] = await Promise.all([fetchCmsTopics(), fetchCmsTimelineByTopic(slug)]);
+  const fallbackTopic = getTopicBySlug(slug);
+  const cmsTopic = topicCards.find((topic) => topic.slug === slug);
+
+  if (cmsTopic) {
+    return { topic: cmsTopic, timeline };
   }
 
-  return getLatestVideos(6);
+  if (fallbackTopic) {
+    return { topic: fallbackTopic, timeline: timeline.length > 0 ? timeline : getTopicTimeline(slug) };
+  }
+
+  return null;
+}
+
+export async function getTopicStories(slug: string, limit = 8) {
+  const stories = await fetchCmsArticles();
+  return stories.filter((story) => story.topic?.slug === slug).slice(0, limit);
+}
+
+export async function getPersonalizationSeed() {
+  const [stories, topicCards, navCategories] = await Promise.all([fetchCmsArticles(), fetchCmsTopics(), fetchCmsCategories()]);
+
+  return {
+    stories: stories.slice(0, 18),
+    topics: topicCards,
+    categories: navCategories,
+  };
 }
 
 export async function getAllSlugs() {
@@ -220,4 +393,19 @@ export async function getAllSlugs() {
 export async function getCategorySlugs() {
   const navCategories = await fetchCmsCategories();
   return navCategories.map((category) => category.slug);
+}
+
+export async function getTopicSlugs() {
+  const topicCards = await fetchCmsTopics();
+  return topicCards.length > 0 ? topicCards.map((topic) => topic.slug) : getTopicCards().map((topic) => topic.slug);
+}
+
+export async function getTopicTimelineData(slug: string) {
+  const timeline = await fetchCmsTimelineByTopic(slug);
+
+  if (timeline.length > 0) {
+    return timeline;
+  }
+
+  return timelineEvents.filter((event) => event.topicSlug === slug);
 }
