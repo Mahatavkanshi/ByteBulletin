@@ -62,7 +62,26 @@ h5 {
   animation: ticker 18s linear infinite;
 }
 
+.headline-track {
+  animation: headlineTicker 28s linear infinite;
+}
+
+.news-scroll-panel {
+  max-height: 44rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
 @keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes headlineTicker {
   from {
     transform: translateX(0);
   }

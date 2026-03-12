@@ -129,6 +129,17 @@ export default async function Home() {
 
   const sidebarDeskPicks = localPool.filter((story) => !usedStorySlugs.has(story.slug)).slice(0, 3);
   const sidebarWirePicks = sidebarDeskPicks.length < 3 ? liveUpdates.slice(0, 3 - sidebarDeskPicks.length) : [];
+  const seenBottomStories = new Set<string>();
+  const bottomScrollerStories = [...storyPool, ...latest]
+    .filter((story) => {
+      if (seenBottomStories.has(story.slug)) {
+        return false;
+      }
+
+      seenBottomStories.add(story.slug);
+      return story.slug !== featured.slug;
+    })
+    .slice(0, 10);
   const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
   const videoDeskBriefs = latestVideos.slice(0, 4);
   const liveUpdateImageFallbacks = [
@@ -483,7 +494,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid items-start gap-6 lg:grid-cols-[2fr_1fr]">
-              <article className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+              <article className="h-full overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
                 <div className="aspect-video bg-[#1e3242]">
                   {featuredVideoEmbed ? (
                     <iframe
@@ -526,7 +537,7 @@ export default async function Home() {
                 </div>
               </article>
 
-              <div className="space-y-6">
+              <div className="news-scroll-panel space-y-6">
                 {latestVideos.slice(0, 3).map((video) => {
                   const thumbnail = getYoutubeThumbnailUrl(video.youtubeUrl);
                   return (
@@ -588,6 +599,28 @@ export default async function Home() {
                   </article>
                 );
               })}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-surface p-5">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="text-2xl">More Headlines</h3>
+              <Link href="/search" className="text-sm font-semibold text-brand hover:underline">
+                Open full feed
+              </Link>
+            </div>
+            <div className="overflow-hidden">
+              <div className="headline-track flex w-[200%] gap-4 whitespace-nowrap">
+                {[...bottomScrollerStories, ...bottomScrollerStories].map((story, index) => (
+                  <Link
+                    key={`bottom-scroll-${story.slug}-${index}`}
+                    href={`/news/${story.slug}`}
+                    className="inline-flex min-w-[18rem] max-w-[24rem] items-center rounded-md border border-border bg-background px-4 py-3 text-sm font-semibold leading-snug text-[#25384a] hover:text-brand"
+                  >
+                    {story.title}
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
         </section>
