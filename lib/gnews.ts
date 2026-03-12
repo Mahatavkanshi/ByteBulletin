@@ -3,6 +3,7 @@ export type GNewsHeadline = {
   description: string;
   url: string;
   publishedAt: string;
+  imageUrl?: string;
 };
 
 type GNewsResponse = {
@@ -11,6 +12,7 @@ type GNewsResponse = {
     description?: string;
     url?: string;
     publishedAt?: string;
+    image?: string;
     source?: { name?: string };
   }>;
 };
@@ -89,14 +91,25 @@ export async function fetchGNewsHeadlines(limit = 8): Promise<GNewsHeadline[]> {
 
     const payload = (await response.json()) as GNewsResponse;
 
+    const seen = new Set<string>();
+
     return (payload.articles ?? [])
       .map((article) => ({
         title: cleanHeadline(article.title ?? ""),
         description: article.description ?? "",
         url: article.url ?? "",
         publishedAt: formatPublishedAt(article.publishedAt ?? ""),
+        imageUrl: article.image ?? "",
       }))
-      .filter((article) => article.title && article.url);
+      .filter((article) => {
+        const dedupeKey = `${article.title.toLowerCase()}|${article.url}`;
+        if (!article.title || !article.url || seen.has(dedupeKey)) {
+          return false;
+        }
+
+        seen.add(dedupeKey);
+        return true;
+      });
   } catch {
     return [];
   }

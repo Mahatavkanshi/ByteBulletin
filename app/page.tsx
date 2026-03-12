@@ -33,11 +33,16 @@ export default async function Home() {
   });
   const showFallbackLatest = liveUpdates.length === 0;
   const fallbackLatestStories = latest.filter((story) => story.slug !== featured.slug).slice(0, 4);
+  const desiredTrendingCount = 3;
+  const desiredHighlightCount = 3;
+  const localPool = latest.filter((story) => story.slug !== featured.slug);
 
   const usedStorySlugs = new Set<string>([featured.slug]);
   if (showFallbackLatest) {
     fallbackLatestStories.forEach((story) => usedStorySlugs.add(story.slug));
   }
+
+  const maxTrendingCount = Math.max(1, Math.min(desiredTrendingCount, localPool.length - desiredHighlightCount));
 
   const trendingStories = [] as typeof trending;
   for (const story of trending) {
@@ -48,13 +53,13 @@ export default async function Home() {
     trendingStories.push(story);
     usedStorySlugs.add(story.slug);
 
-    if (trendingStories.length === 4) {
+    if (trendingStories.length === maxTrendingCount) {
       break;
     }
   }
 
-  if (trendingStories.length < 4) {
-    for (const story of latest) {
+  if (trendingStories.length < maxTrendingCount) {
+    for (const story of localPool) {
       if (usedStorySlugs.has(story.slug)) {
         continue;
       }
@@ -62,7 +67,7 @@ export default async function Home() {
       trendingStories.push(story);
       usedStorySlugs.add(story.slug);
 
-      if (trendingStories.length === 4) {
+      if (trendingStories.length === maxTrendingCount) {
         break;
       }
     }
@@ -77,26 +82,54 @@ export default async function Home() {
     await Promise.all(
       categoryPool.slice(0, 6).map(async (category) => {
         const stories = await getStoriesByCategory(category.slug);
-        const uniqueStory = stories.find((story) => !usedStorySlugs.has(story.slug)) ?? stories[0];
+        const uniqueStory = stories.find((story) => !usedStorySlugs.has(story.slug));
 
         if (!uniqueStory) {
           return null;
         }
 
+        usedStorySlugs.add(uniqueStory.slug);
         return { category, story: uniqueStory };
       }),
     )
-  ).filter((item) => item !== null);
-  const sidebarDeskPicks = latest.filter((story) => story.slug !== featured.slug).slice(0, 3);
+  ).filter((item): item is { category: (typeof categoryPool)[number]; story: (typeof latest)[number] } => item !== null);
+
+  if (sectionHighlights.length < desiredHighlightCount) {
+    for (const story of localPool) {
+      if (usedStorySlugs.has(story.slug)) {
+        continue;
+      }
+
+      const storyCategory =
+        categories.find((category) => category.slug === story.category) ||
+        fallbackCategoryList.find((category) => category.slug === story.category);
+
+      if (!storyCategory) {
+        continue;
+      }
+
+      sectionHighlights.push({ category: storyCategory, story });
+      usedStorySlugs.add(story.slug);
+
+      if (sectionHighlights.length === desiredHighlightCount) {
+        break;
+      }
+    }
+  }
+
+  const sidebarDeskPicks = localPool.filter((story) => !usedStorySlugs.has(story.slug)).slice(0, 3);
+  const sidebarWirePicks = sidebarDeskPicks.length < 3 ? liveUpdates.slice(0, 3 - sidebarDeskPicks.length) : [];
   const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
   const videoDeskBriefs = latestVideos.slice(0, 4);
   const liveUpdateImageFallbacks = [
-    "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=80",
-    "https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?auto=format&fit=crop&w=1400&q=80",
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
-    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80",
-    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1400&q=80",
-    "https://images.unsplash.com/photo-1516387938699-a93567ec168e?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1477233534935-f5e6fe7c1159?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=80",
   ];
 
   return (
@@ -321,6 +354,27 @@ export default async function Home() {
                   </Link>
                 </article>
               ))}
+              {sidebarWirePicks.map((update, index) => (
+                <article key={`desk-wire-${update.url}`} className="rounded-lg border border-border bg-background p-4">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-md border border-border">
+                    <Image
+                      src={liveUpdateImageFallbacks[(index + 4) % liveUpdateImageFallbacks.length]}
+                      alt={update.title}
+                      fill
+                      sizes="(max-width: 1280px) 100vw, 360px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <h4 className="mt-3 text-xl leading-snug">{update.title}</h4>
+                  <p className="mt-2 text-sm text-muted">{update.publishedAt || "Updated recently"}</p>
+                  <a href={update.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm font-semibold text-brand hover:underline">
+                    Read wire
+                  </a>
+                </article>
+              ))}
+              {sidebarDeskPicks.length === 0 && sidebarWirePicks.length === 0 ? (
+                <p className="text-sm text-muted">Fresh desk picks are being curated.</p>
+              ) : null}
             </div>
           </section>
         </aside>
