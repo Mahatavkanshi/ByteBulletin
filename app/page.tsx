@@ -122,6 +122,18 @@ export default async function Home() {
     "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=80",
   ];
+  const factCheckImageFallbacks = [
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1589994965851-a8f479c573a9?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1400&q=80",
+  ];
+  const topicImageFallbacks = [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1400&q=80",
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
@@ -379,8 +391,17 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid auto-rows-fr gap-6 md:grid-cols-3">
-              {factChecks.map((check) => (
+              {factChecks.map((check, index) => (
                 <article key={check.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
+                  <div className="relative mb-4 aspect-[16/8] overflow-hidden rounded-lg border border-border">
+                    <Image
+                      src={factCheckImageFallbacks[index % factCheckImageFallbacks.length]}
+                      alt={check.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="rounded-full bg-[#1e3242] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ecf5ff]">
                       {check.verdict}
@@ -406,8 +427,17 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid auto-rows-fr gap-6 md:grid-cols-3">
-              {topicCards.map((topic) => (
+              {topicCards.map((topic, index) => (
                 <article key={topic.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
+                  <div className="relative mb-4 aspect-[16/8] overflow-hidden rounded-lg border border-border">
+                    <Image
+                      src={topicImageFallbacks[index % topicImageFallbacks.length]}
+                      alt={topic.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-brand">Ongoing Story</p>
                   <h4 className="mt-2 text-2xl leading-tight">{topic.name}</h4>
                   <p className="mt-3 text-base text-muted">{topic.summary}</p>
