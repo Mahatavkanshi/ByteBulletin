@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { DailyBriefBoard } from "@/components/daily-brief-board";
 import {
   getFactCheckStories,
   getHomepageStories,
@@ -45,7 +46,25 @@ export default async function Home() {
     fallbackLatestStories.forEach((story) => usedStorySlugs.add(story.slug));
   }
 
-  const maxTrendingCount = Math.max(1, Math.min(desiredTrendingCount, localPool.length - desiredHighlightCount));
+  const briefCandidates = localPool.filter((story) => !usedStorySlugs.has(story.slug));
+  const morningBriefStories = briefCandidates.slice(0, 3);
+  const eveningWrapStories = briefCandidates.slice(3, 6);
+  const briefReservedSlugs = new Set([...morningBriefStories, ...eveningWrapStories].map((story) => story.slug));
+  const explainerStory =
+    briefCandidates.find((story) => !briefReservedSlugs.has(story.slug) && ["opinion", "technology", "business"].includes(story.category)) ??
+    briefCandidates.find((story) => !briefReservedSlugs.has(story.slug)) ??
+    null;
+
+  if (explainerStory) {
+    briefReservedSlugs.add(explainerStory.slug);
+  }
+
+  for (const slug of briefReservedSlugs) {
+    usedStorySlugs.add(slug);
+  }
+
+  const remainingStoriesCount = localPool.filter((story) => !usedStorySlugs.has(story.slug)).length;
+  const maxTrendingCount = Math.max(1, Math.min(desiredTrendingCount, remainingStoriesCount));
 
   const trendingStories = [] as typeof trending;
   for (const story of trending) {
@@ -269,6 +288,12 @@ export default async function Home() {
                   ))}
             </div>
           </section>
+
+          <DailyBriefBoard
+            morningStories={morningBriefStories}
+            eveningStories={eveningWrapStories}
+            explainerStory={explainerStory}
+          />
         </section>
 
         <aside className="reveal-up space-y-8" style={{ animationDelay: "120ms" }}>
