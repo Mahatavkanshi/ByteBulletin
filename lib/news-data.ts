@@ -258,6 +258,75 @@ export const newsArticles: NewsArticle[] = [
       "The next decade will test whether cities can integrate climate adaptation into everyday planning rather than treating it as a parallel agenda.",
     ],
   },
+  {
+    title: "State boards roll out digital mark sheets with QR verification",
+    slug: "state-boards-digital-marksheets-qr-verification",
+    summary:
+      "Education departments begin phased distribution of tamper-resistant digital certificates for Class 10 and 12 students.",
+    coverImageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80",
+    category: "national",
+    author: "Priya Nair",
+    location: "Hyderabad",
+    publishedAt: "Mar 9, 2026",
+    readTime: "4 min read",
+    content: [
+      "Multiple state education boards have started issuing digital mark sheets with built-in QR authentication. Officials say the move will reduce delays in college admissions and prevent forged certificates.",
+      "Students can now share a secure verification link with universities and employers. Education technology teams are coordinating with school administrators for phased onboarding across districts.",
+      "Policy experts say the success of the rollout depends on offline access support and grievance channels for rural students with inconsistent internet connectivity.",
+    ],
+  },
+  {
+    title: "Ports on western coast test smart cargo lanes for faster clearance",
+    slug: "western-coast-ports-smart-cargo-lanes",
+    summary:
+      "Customs and logistics operators launch pilot corridors aimed at reducing turnaround times for priority shipments.",
+    coverImageUrl: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80",
+    category: "business",
+    author: "Amit Verma",
+    location: "Mumbai",
+    publishedAt: "Mar 8, 2026",
+    readTime: "5 min read",
+    content: [
+      "Major ports on the western coast have initiated smart cargo lanes using pre-filed documentation and automated risk scoring. The pilot focuses on electronics, pharmaceuticals and perishables.",
+      "Trade associations expect the changes to reduce idle container time and improve predictability for exporters. Early data from two terminals shows shorter gate-to-vessel timelines.",
+      "Analysts caution that broader gains will require synchronized trucking slots and warehousing reforms outside port boundaries.",
+    ],
+  },
+  {
+    title: "Indian startup consortium unveils open language stack for public services",
+    slug: "indian-startup-consortium-open-language-stack-public-services",
+    summary:
+      "A new collaboration aims to improve AI interfaces for citizen platforms in multiple Indian languages.",
+    coverImageUrl: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
+    category: "technology",
+    author: "Meera Krishnan",
+    location: "Bengaluru",
+    publishedAt: "Mar 8, 2026",
+    readTime: "6 min read",
+    topic: { name: "India AI Race", slug: "india-ai-race" },
+    content: [
+      "A consortium of Indian startups and research labs has launched an open language stack designed for governance and public-service workflows. The stack includes translation, summarization and voice modules.",
+      "Developers say the architecture is optimized for low-latency inference on modest infrastructure, making it suitable for district-level deployments. Pilot projects are expected in grievance portals and health helplines.",
+      "Researchers highlighted the need for transparent benchmarks and bias audits before deployment at national scale.",
+    ],
+  },
+  {
+    title: "Regional energy ministers agree on grid flexibility roadmap",
+    slug: "regional-energy-ministers-grid-flexibility-roadmap",
+    summary:
+      "Member countries commit to coordinated storage planning and cross-border balancing pilots.",
+    coverImageUrl: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1600&q=80",
+    category: "world",
+    author: "Sana Qureshi",
+    location: "Singapore",
+    publishedAt: "Mar 7, 2026",
+    readTime: "5 min read",
+    content: [
+      "Energy ministers from several regional economies endorsed a flexibility roadmap to manage volatility from renewable-heavy grids. The plan includes joint storage tenders and coordinated reserve dispatch trials.",
+      "Officials expect the roadmap to improve resilience during heatwaves and peak-demand windows. Utilities will publish quarterly readiness notes to track implementation.",
+      "Power-market experts said regulatory harmonization and transparent pricing signals remain critical for long-term impact.",
+    ],
+  },
 ];
 
 export const videoStories: VideoStory[] = [

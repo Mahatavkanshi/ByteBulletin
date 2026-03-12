@@ -218,7 +218,16 @@ const fetchCmsArticles = cache(async (): Promise<NewsArticle[]> => {
 
   try {
     const cmsArticles = await sanityClient.fetch<CmsArticle[]>(allArticlesQuery);
-    return cmsArticles.length > 0 ? cmsArticles.map(normalizeArticle) : newsArticles;
+
+    if (cmsArticles.length === 0) {
+      return newsArticles;
+    }
+
+    const normalizedCmsArticles = cmsArticles.map(normalizeArticle);
+    const cmsSlugs = new Set(normalizedCmsArticles.map((article) => article.slug));
+    const fallbackArticles = newsArticles.filter((article) => !cmsSlugs.has(article.slug));
+
+    return [...normalizedCmsArticles, ...fallbackArticles];
   } catch {
     return newsArticles;
   }

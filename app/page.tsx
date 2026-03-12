@@ -4,7 +4,7 @@ import {
   getFactCheckStories,
   getHomepageStories,
   getHomepageVideos,
-  getStoriesByCategory,
+  getSearchStories,
   getTopicCardsData,
 } from "@/lib/content";
 import { categories as fallbackCategoryList, resolveStoryImage } from "@/lib/news-data";
@@ -17,12 +17,14 @@ export default async function Home() {
     { featuredVideo, latestVideos },
     factChecks,
     topicCards,
+    allStories,
     utilityWidgets,
   ] = await Promise.all([
     getHomepageStories(),
     getHomepageVideos(),
     getFactCheckStories(3),
     getTopicCardsData(3),
+    getSearchStories(),
     getUtilityWidgets(),
   ]);
   const today = new Date().toLocaleDateString("en-US", {
@@ -34,8 +36,9 @@ export default async function Home() {
   const showFallbackLatest = liveUpdates.length === 0;
   const fallbackLatestStories = latest.filter((story) => story.slug !== featured.slug).slice(0, 4);
   const desiredTrendingCount = 3;
-  const desiredHighlightCount = 3;
-  const localPool = latest.filter((story) => story.slug !== featured.slug);
+  const desiredHighlightCount = 6;
+  const storyPool = (allStories.length > 0 ? allStories : latest).filter((story) => story.slug !== featured.slug);
+  const localPool = storyPool;
 
   const usedStorySlugs = new Set<string>([featured.slug]);
   if (showFallbackLatest) {
@@ -73,47 +76,35 @@ export default async function Home() {
     }
   }
 
-  const categoryPool =
-    categories.length >= 4
-      ? categories
-      : [...categories, ...fallbackCategoryList.filter((fallback) => !categories.some((category) => category.slug === fallback.slug))];
+  const categoryPool = [...categories, ...fallbackCategoryList.filter((fallback) => !categories.some((category) => category.slug === fallback.slug))];
+  const categoryMap = new Map(categoryPool.map((category) => [category.slug, category]));
 
-  const sectionHighlights = (
-    await Promise.all(
-      categoryPool.slice(0, 6).map(async (category) => {
-        const stories = await getStoriesByCategory(category.slug);
-        const uniqueStory = stories.find((story) => !usedStorySlugs.has(story.slug));
+  const sectionHighlights: Array<{ category: { name: string; slug: string; accent: string }; story: (typeof localPool)[number] }> = [];
+  for (const story of localPool) {
+    if (usedStorySlugs.has(story.slug)) {
+      continue;
+    }
 
-        if (!uniqueStory) {
-          return null;
-        }
+    const mappedCategory = categoryMap.get(story.category);
+    const fallbackName = story.category
+      .split("-")
+      .filter(Boolean)
+      .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+      .join(" ");
 
-        usedStorySlugs.add(uniqueStory.slug);
-        return { category, story: uniqueStory };
-      }),
-    )
-  ).filter((item): item is { category: (typeof categoryPool)[number]; story: (typeof latest)[number] } => item !== null);
+    sectionHighlights.push({
+      category:
+        mappedCategory ?? {
+          name: fallbackName || "General",
+          slug: story.category || "general",
+          accent: "#8b1f1f",
+        },
+      story,
+    });
+    usedStorySlugs.add(story.slug);
 
-  if (sectionHighlights.length < desiredHighlightCount) {
-    for (const story of localPool) {
-      if (usedStorySlugs.has(story.slug)) {
-        continue;
-      }
-
-      const storyCategory =
-        categories.find((category) => category.slug === story.category) ||
-        fallbackCategoryList.find((category) => category.slug === story.category);
-
-      if (!storyCategory) {
-        continue;
-      }
-
-      sectionHighlights.push({ category: storyCategory, story });
-      usedStorySlugs.add(story.slug);
-
-      if (sectionHighlights.length === desiredHighlightCount) {
-        break;
-      }
+    if (sectionHighlights.length === desiredHighlightCount) {
+      break;
     }
   }
 
