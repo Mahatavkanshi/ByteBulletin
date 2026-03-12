@@ -75,6 +75,20 @@ h5 {
   animation: revealUp 0.7s ease-out both;
 }
 
+.title-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.excerpt-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @keyframes revealUp {
   from {
     opacity: 0;

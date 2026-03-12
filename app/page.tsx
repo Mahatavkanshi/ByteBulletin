@@ -31,11 +31,54 @@ export default async function Home() {
     day: "numeric",
     year: "numeric",
   });
+  const showFallbackLatest = liveUpdates.length === 0;
+  const fallbackLatestStories = latest.filter((story) => story.slug !== featured.slug).slice(0, 4);
+
+  const usedStorySlugs = new Set<string>([featured.slug]);
+  if (showFallbackLatest) {
+    fallbackLatestStories.forEach((story) => usedStorySlugs.add(story.slug));
+  }
+
+  const trendingStories = [] as typeof trending;
+  for (const story of trending) {
+    if (usedStorySlugs.has(story.slug)) {
+      continue;
+    }
+
+    trendingStories.push(story);
+    usedStorySlugs.add(story.slug);
+
+    if (trendingStories.length === 4) {
+      break;
+    }
+  }
+
+  if (trendingStories.length < 4) {
+    for (const story of latest) {
+      if (usedStorySlugs.has(story.slug)) {
+        continue;
+      }
+
+      trendingStories.push(story);
+      usedStorySlugs.add(story.slug);
+
+      if (trendingStories.length === 4) {
+        break;
+      }
+    }
+  }
+
   const sectionHighlights = (
     await Promise.all(
       categories.slice(0, 6).map(async (category) => {
-        const firstStory = (await getStoriesByCategory(category.slug))[0];
-        return firstStory ? { category, story: firstStory } : null;
+        const stories = await getStoriesByCategory(category.slug);
+        const uniqueStory = stories.find((story) => !usedStorySlugs.has(story.slug)) ?? stories[0];
+
+        if (!uniqueStory) {
+          return null;
+        }
+
+        return { category, story: uniqueStory };
       }),
     )
   ).filter((item) => item !== null);
@@ -134,10 +177,10 @@ export default async function Home() {
                 View all
               </Link>
             </div>
-            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
               {liveUpdates.length > 0
                 ? liveUpdates.map((update, index) => (
-                    <article key={update.url} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
+                    <article key={update.url} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">Daily Wire</p>
                       <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border">
                         <Image
@@ -148,21 +191,21 @@ export default async function Home() {
                           className="object-cover"
                         />
                       </div>
-                      <h4 className="mt-2 text-2xl leading-tight">{update.title}</h4>
-                      <p className="mt-3 text-base text-muted">{update.description || "Read the full update from the source."}</p>
+                      <h4 className="title-clamp mt-2 text-2xl leading-tight">{update.title}</h4>
+                      <p className="excerpt-clamp mt-3 text-base text-muted">{update.description || "Read the full update from the source."}</p>
                       <div className="mt-4 text-sm text-muted">{update.publishedAt || "Updated recently"}</div>
                       <a
                         href={update.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline"
+                        className="mt-4 inline-block text-base font-semibold text-brand hover:underline"
                       >
                         Read full update
                       </a>
                     </article>
                   ))
-                : latest.map((story) => (
-                    <article key={story.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
+                : fallbackLatestStories.map((story) => (
+                    <article key={story.slug} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">{story.category}</p>
                       <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border">
                         <Image
@@ -173,17 +216,91 @@ export default async function Home() {
                           className="object-cover"
                         />
                       </div>
-                      <h4 className="mt-2 text-2xl leading-tight">{story.title}</h4>
-                      <p className="mt-3 text-base text-muted">{story.summary}</p>
+                      <h4 className="title-clamp mt-2 text-2xl leading-tight">{story.title}</h4>
+                      <p className="excerpt-clamp mt-3 text-base text-muted">{story.summary}</p>
                       <div className="mt-4 text-sm text-muted">{story.readTime}</div>
-                      <Link href={`/news/${story.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
+                      <Link href={`/news/${story.slug}`} className="mt-4 inline-block text-base font-semibold text-brand hover:underline">
                         Continue reading
                       </Link>
                     </article>
                   ))}
             </div>
           </section>
+        </section>
 
+        <aside className="reveal-up space-y-8" style={{ animationDelay: "120ms" }}>
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h3 className="text-2xl">Trending</h3>
+            <div className="mt-4 space-y-4">
+              {trendingStories.map((story, index) => (
+                <article key={story.slug} className="border-b border-border pb-3 last:border-none last:pb-0">
+                  <p className="text-sm font-semibold text-brand">0{index + 1}</p>
+                  <h4 className="mt-1 text-xl leading-snug">{story.title}</h4>
+                  <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-sm font-semibold uppercase tracking-wide text-muted hover:text-brand">
+                    Read more
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-2xl">City Utility</h3>
+              <span className="text-sm text-muted">{utilityWidgets.city}</span>
+            </div>
+            <div className="mt-5 space-y-4 text-base">
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Weather</p>
+                <p className="mt-1 text-lg">
+                  {utilityWidgets.weather.temperatureC}C | {utilityWidgets.weather.condition}
+                </p>
+                <p className="text-sm text-muted">Wind {utilityWidgets.weather.windKph} km/h</p>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Air Quality</p>
+                <p className="mt-1 text-lg">AQI {utilityWidgets.airQuality.aqi ?? "--"}</p>
+                <p className="text-sm text-muted">
+                  PM2.5 {utilityWidgets.airQuality.pm25 ?? "--"} | PM10 {utilityWidgets.airQuality.pm10 ?? "--"}
+                </p>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">INR FX</p>
+                <p className="mt-1 text-lg">
+                  USD {utilityWidgets.forex.usd ?? "--"} | EUR {utilityWidgets.forex.eur ?? "--"}
+                </p>
+                <p className="text-sm text-muted">Updated {utilityWidgets.updatedAt}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-[#1e3242] p-6 text-[#ecf5ff]">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8bc2f5]">Newsletter</p>
+            <h3 className="mt-2 text-3xl">Get the Morning Brief</h3>
+            <p className="mt-3 text-base text-[#d4e7f8]">
+              Daily digest on policy, business and technology in under 5 minutes.
+            </p>
+            <form className="mt-5 space-y-3">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full rounded-md border border-[#4f667b] bg-[#243d50] px-4 py-3 text-base outline-none placeholder:text-[#a2c3df] focus:border-[#8bc2f5]"
+              />
+              <button type="submit" className="w-full rounded-md bg-[#8bc2f5] px-4 py-3 text-base font-semibold text-[#163148]">
+                Subscribe Free
+              </button>
+            </form>
+          </section>
+
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h3 className="text-2xl">Editor&apos;s Note</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted">
+              Byte Bulletin is designed for readers who want depth without noise. Every piece is built for clarity, context and responsible reporting.
+            </p>
+          </section>
+        </aside>
+
+        <section className="reveal-up space-y-10 lg:col-span-2" style={{ animationDelay: "220ms" }}>
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
               <h3 className="text-3xl">Fact Check Lane</h3>
@@ -231,6 +348,7 @@ export default async function Home() {
               ))}
             </div>
           </section>
+
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
               <h3 className="text-3xl">Video Bulletin</h3>
@@ -306,7 +424,7 @@ export default async function Home() {
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {sectionHighlights.map(({ category, story }) => {
                 return (
-                  <article key={category.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6">
+                  <article key={`${category.slug}-${story.slug}`} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: category.accent }}>
                       {category.name}
                     </p>
@@ -330,78 +448,6 @@ export default async function Home() {
             </div>
           </section>
         </section>
-
-        <aside className="reveal-up space-y-8" style={{ animationDelay: "120ms" }}>
-          <section className="rounded-xl border border-border bg-surface p-6">
-            <h3 className="text-2xl">Trending</h3>
-            <div className="mt-4 space-y-4">
-              {trending.map((story, index) => (
-                <article key={story.slug} className="border-b border-border pb-3 last:border-none last:pb-0">
-                  <p className="text-sm font-semibold text-brand">0{index + 1}</p>
-                  <h4 className="mt-1 text-xl leading-snug">{story.title}</h4>
-                  <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-sm font-semibold uppercase tracking-wide text-muted hover:text-brand">
-                    Read more
-                  </Link>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-xl border border-border bg-surface p-6">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-2xl">City Utility</h3>
-              <span className="text-sm text-muted">{utilityWidgets.city}</span>
-            </div>
-            <div className="mt-5 space-y-4 text-base">
-              <div className="rounded-md border border-border p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Weather</p>
-                <p className="mt-1 text-lg">
-                  {utilityWidgets.weather.temperatureC}C | {utilityWidgets.weather.condition}
-                </p>
-                <p className="text-sm text-muted">Wind {utilityWidgets.weather.windKph} km/h</p>
-              </div>
-              <div className="rounded-md border border-border p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Air Quality</p>
-                <p className="mt-1 text-lg">AQI {utilityWidgets.airQuality.aqi ?? "--"}</p>
-                <p className="text-sm text-muted">
-                  PM2.5 {utilityWidgets.airQuality.pm25 ?? "--"} | PM10 {utilityWidgets.airQuality.pm10 ?? "--"}
-                </p>
-              </div>
-              <div className="rounded-md border border-border p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-brand">INR FX</p>
-                <p className="mt-1 text-lg">
-                  USD {utilityWidgets.forex.usd ?? "--"} | EUR {utilityWidgets.forex.eur ?? "--"}
-                </p>
-                <p className="text-sm text-muted">Updated {utilityWidgets.updatedAt}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-xl border border-border bg-[#1e3242] p-6 text-[#ecf5ff]">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8bc2f5]">Newsletter</p>
-            <h3 className="mt-2 text-3xl">Get the Morning Brief</h3>
-            <p className="mt-3 text-base text-[#d4e7f8]">
-              Daily digest on policy, business and technology in under 5 minutes.
-            </p>
-            <form className="mt-5 space-y-3">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full rounded-md border border-[#4f667b] bg-[#243d50] px-4 py-3 text-base outline-none placeholder:text-[#a2c3df] focus:border-[#8bc2f5]"
-              />
-              <button type="submit" className="w-full rounded-md bg-[#8bc2f5] px-4 py-3 text-base font-semibold text-[#163148]">
-                Subscribe Free
-              </button>
-            </form>
-          </section>
-
-          <section className="rounded-xl border border-border bg-surface p-6">
-            <h3 className="text-2xl">Editor&apos;s Note</h3>
-            <p className="mt-3 text-base leading-relaxed text-muted">
-              Byte Bulletin is designed for readers who want depth without noise. Every piece is built for clarity, context and responsible reporting.
-            </p>
-          </section>
-        </aside>
       </main>
     </div>
   );
