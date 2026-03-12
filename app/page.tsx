@@ -1,11 +1,33 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getHomepageStories, getHomepageVideos, getStoriesByCategory } from "@/lib/content";
+import { PersonalFeed } from "@/components/personal-feed";
+import {
+  getFactCheckStories,
+  getHomepageStories,
+  getHomepageVideos,
+  getPersonalizationSeed,
+  getStoriesByCategory,
+  getTopicCardsData,
+} from "@/lib/content";
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/video-utils";
+import { getUtilityWidgets } from "@/lib/widgets";
 
 export default async function Home() {
-  const [{ featured, latest, trending, categories, liveUpdates, breaking }, { featuredVideo, latestVideos }] =
-    await Promise.all([getHomepageStories(), getHomepageVideos()]);
+  const [
+    { featured, latest, trending, categories, liveUpdates, breaking },
+    { featuredVideo, latestVideos },
+    factChecks,
+    topicCards,
+    personalizationSeed,
+    utilityWidgets,
+  ] = await Promise.all([
+    getHomepageStories(),
+    getHomepageVideos(),
+    getFactCheckStories(3),
+    getTopicCardsData(3),
+    getPersonalizationSeed(),
+    getUtilityWidgets(),
+  ]);
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
