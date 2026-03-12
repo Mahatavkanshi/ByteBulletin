@@ -7,7 +7,7 @@ import {
   getStoriesByCategory,
   getTopicCardsData,
 } from "@/lib/content";
-import { resolveStoryImage } from "@/lib/news-data";
+import { categories as fallbackCategoryList, resolveStoryImage } from "@/lib/news-data";
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/video-utils";
 import { getUtilityWidgets } from "@/lib/widgets";
 
@@ -68,9 +68,14 @@ export default async function Home() {
     }
   }
 
+  const categoryPool =
+    categories.length >= 4
+      ? categories
+      : [...categories, ...fallbackCategoryList.filter((fallback) => !categories.some((category) => category.slug === fallback.slug))];
+
   const sectionHighlights = (
     await Promise.all(
-      categories.slice(0, 6).map(async (category) => {
+      categoryPool.slice(0, 6).map(async (category) => {
         const stories = await getStoriesByCategory(category.slug);
         const uniqueStory = stories.find((story) => !usedStorySlugs.has(story.slug)) ?? stories[0];
 
