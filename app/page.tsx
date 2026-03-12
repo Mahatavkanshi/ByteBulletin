@@ -289,11 +289,6 @@ export default async function Home() {
             </div>
           </section>
 
-          <DailyBriefBoard
-            morningStories={morningBriefStories}
-            eveningStories={eveningWrapStories}
-            explainerStory={explainerStory}
-          />
         </section>
 
         <aside className="reveal-up space-y-8" style={{ animationDelay: "120ms" }}>
@@ -408,6 +403,12 @@ export default async function Home() {
         </aside>
 
         <section className="reveal-up space-y-10 lg:col-span-2" style={{ animationDelay: "220ms" }}>
+          <DailyBriefBoard
+            morningStories={morningBriefStories}
+            eveningStories={eveningWrapStories}
+            explainerStory={explainerStory}
+          />
+
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
               <h3 className="text-3xl">Fact Check Lane</h3>

@@ -57,6 +57,17 @@ export function DailyBriefBoard({ morningStories, eveningStories, explainerStory
     [morningStories, eveningStories, explainerStory],
   );
 
+  const quickReadStories = useMemo(() => {
+    const excluded = new Set<string>([
+      ...morningStories.map((story) => story.slug),
+      ...eveningStories.map((story) => story.slug),
+      ...(explainerStory ? [explainerStory.slug] : []),
+    ]);
+
+    const extras = candidateStories.filter((story) => !excluded.has(story.slug)).slice(0, 4);
+    return extras.length > 0 ? extras : candidateStories.slice(0, 4);
+  }, [candidateStories, eveningStories, explainerStory, morningStories]);
+
   function saveToStorage(nextStories: BriefStory[]) {
     setSavedStories(nextStories);
     localStorage.setItem(savedStoriesStorageKey, JSON.stringify(nextStories));
@@ -131,7 +142,7 @@ export function DailyBriefBoard({ morningStories, eveningStories, explainerStory
           {renderBriefList(eveningStories, "Evening Wrap")}
         </div>
 
-        <aside className="space-y-6">
+        <aside className="flex h-full flex-col gap-6">
           <section className="rounded-xl border border-border bg-background p-5">
             <h4 className="text-xl">Explainer of the Day</h4>
             {explainerStory ? (
@@ -175,6 +186,29 @@ export function DailyBriefBoard({ morningStories, eveningStories, explainerStory
                   </article>
                 ))
               )}
+            </div>
+          </section>
+
+          <section className="flex-1 rounded-xl border border-border bg-background p-5">
+            <h4 className="text-xl">Quick Reads</h4>
+            <p className="mt-2 text-sm text-muted">Fast links from today&apos;s brief desk.</p>
+            <div className="mt-4 space-y-3">
+              {quickReadStories.map((story, index) => (
+                <article key={`quick-${story.slug}`} className="rounded-md border border-border bg-surface p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-semibold text-brand">{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <p className="text-sm font-semibold leading-snug">{story.title}</p>
+                      <p className="mt-1 text-xs text-muted">
+                        {story.category} | {story.publishedAt}
+                      </p>
+                    </div>
+                  </div>
+                  <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-xs font-semibold text-brand hover:underline">
+                    Open
+                  </Link>
+                </article>
+              ))}
             </div>
           </section>
         </aside>
