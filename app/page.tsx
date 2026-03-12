@@ -361,7 +361,7 @@ export default async function Home() {
                 Watch all
               </Link>
             </div>
-            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+            <div className="grid items-start gap-6 lg:grid-cols-[2fr_1fr]">
               <article className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
                 <div className="aspect-video bg-[#1e3242]">
                   {featuredVideoEmbed ? (
