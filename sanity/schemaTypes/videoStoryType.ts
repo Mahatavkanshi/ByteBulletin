@@ -40,6 +40,13 @@ export const videoStoryType = defineType({
         }),
     }),
     defineField({
+      name: "source",
+      title: "Source / Channel",
+      type: "string",
+      initialValue: "Byte Bulletin",
+      validation: (rule) => rule.required().min(2),
+    }),
+    defineField({
       name: "category",
       title: "Category",
       type: "reference",

@@ -23,6 +23,7 @@ export type VideoStory = {
   slug: string;
   summary: string;
   youtubeUrl: string;
+  source?: string;
   category: string;
   publishedAt: string;
   featured?: boolean;
@@ -142,31 +143,44 @@ export const newsArticles: NewsArticle[] = [
 
 export const videoStories: VideoStory[] = [
   {
-    title: "Budget 2026 explained in 7 minutes",
-    slug: "budget-2026-explained",
-    summary: "A quick visual breakdown of tax changes, rural allocation and infra spending.",
-    youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
-    category: "business",
+    title: "The hopes and fears of Iranians in Germany",
+    slug: "hopes-and-fears-of-iranians-in-germany",
+    summary: "A ground report on how diaspora communities are reacting to regional instability.",
+    youtubeUrl: "https://www.youtube.com/watch?v=uhQqJPACByg",
+    source: "DW News",
+    category: "world",
     publishedAt: "Mar 12, 2026",
     featured: true,
   },
   {
-    title: "How India is preparing for the summer heatwave",
-    slug: "india-heatwave-preparedness",
-    summary: "Ground report on city cooling plans, shelters and district emergency readiness.",
-    youtubeUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    category: "national",
-    publishedAt: "Mar 11, 2026",
+    title: "Iran war: Environmental and health hazard for the Middle East",
+    slug: "iran-war-environmental-and-health-hazard",
+    summary: "An explainer on health, environment, and oil market disruption during conflict.",
+    youtubeUrl: "https://www.youtube.com/watch?v=-WlExaMJyDo",
+    source: "DW News",
+    category: "world",
+    publishedAt: "Mar 12, 2026",
   },
   {
-    title: "AI chips and the new global supply map",
-    slug: "ai-chips-global-supply-map",
-    summary: "An explainer on fabrication hubs, logistics bottlenecks and policy competition.",
-    youtubeUrl: "https://www.youtube.com/watch?v=kXYiU_JCYtU",
-    category: "technology",
-    publishedAt: "Mar 10, 2026",
+    title: "How Russia seeks economic and strategic gains from the Iran war",
+    slug: "russia-economic-strategic-gains-iran-war",
+    summary: "Analysis of energy economics, geopolitics, and alliance dynamics.",
+    youtubeUrl: "https://www.youtube.com/watch?v=yTj5NNy0zLQ",
+    source: "DW News",
+    category: "business",
+    publishedAt: "Mar 12, 2026",
   },
 ];
+
+const defaultVideoStory: VideoStory = {
+  title: "Global headlines in brief",
+  slug: "global-headlines-in-brief",
+  summary: "A short roundup of today's biggest global developments.",
+  youtubeUrl: "https://www.youtube.com/watch?v=uhQqJPACByg",
+  source: "DW News",
+  category: "world",
+  publishedAt: "Mar 12, 2026",
+};
 
 export function getFeaturedStory() {
   return newsArticles.find((article) => article.featured) ?? newsArticles[0];
@@ -195,9 +209,9 @@ export function getRelatedStories(slug: string, category: string) {
 }
 
 export function getFeaturedVideo() {
-  return videoStories.find((video) => video.featured) ?? videoStories[0];
+  return videoStories.find((video) => video.featured) ?? videoStories[0] ?? defaultVideoStory;
 }
 
 export function getLatestVideos(limit = 3) {
-  return videoStories.slice(0, limit);
+  return videoStories.length > 0 ? videoStories.slice(0, limit) : [defaultVideoStory];
 }

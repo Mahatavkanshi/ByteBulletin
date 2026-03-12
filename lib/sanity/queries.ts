@@ -48,6 +48,7 @@ export const allVideosQuery = groq`
     "slug": slug.current,
     summary,
     youtubeUrl,
+    source,
     "category": category->slug.current,
     publishedAt,
     featured

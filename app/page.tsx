@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getHomepageStories, getHomepageVideos, getStoriesByCategory } from "@/lib/content";
 import { getYoutubeEmbedUrl, getYoutubeThumbnailUrl } from "@/lib/video-utils";
 
@@ -150,7 +151,9 @@ export default async function Home() {
                   <p className="text-xs font-semibold uppercase tracking-widest text-brand">Featured Video</p>
                   <h4 className="mt-2 text-2xl leading-tight">{featuredVideo.title}</h4>
                   <p className="mt-2 text-sm text-muted">{featuredVideo.summary}</p>
-                  <div className="mt-3 text-xs text-muted">{featuredVideo.publishedAt}</div>
+                  <div className="mt-3 text-xs text-muted">
+                    {(featuredVideo.source || "Byte Bulletin") + " | " + featuredVideo.publishedAt}
+                  </div>
                 </div>
               </article>
 
@@ -167,8 +170,13 @@ export default async function Home() {
                     >
                       <div className="relative aspect-video overflow-hidden rounded-md bg-[#dae5ef]">
                         {thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={thumbnail} alt={video.title} className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+                          <Image
+                            src={thumbnail}
+                            alt={video.title}
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 320px"
+                            className="object-cover transition group-hover:scale-[1.02]"
+                          />
                         ) : (
                           <div className="flex h-full items-center justify-center text-xs font-semibold text-[#3f5567]">No preview</div>
                         )}
@@ -177,7 +185,7 @@ export default async function Home() {
                         </span>
                       </div>
                       <h4 className="mt-2 text-base leading-snug">{video.title}</h4>
-                      <p className="mt-1 text-xs text-muted">{video.publishedAt}</p>
+                      <p className="mt-1 text-xs text-muted">{(video.source || "Byte Bulletin") + " | " + video.publishedAt}</p>
                     </a>
                   );
                 })}

@@ -14,6 +14,7 @@ import {
   type VideoStory,
 } from "@/lib/news-data";
 import { fetchGNewsHeadlines } from "@/lib/gnews";
+import { fetchYouTubeNewsVideos } from "@/lib/youtube-rss";
 import { isSanityConfigured, sanityClient } from "@/lib/sanity/client";
 import { allArticlesQuery, allVideosQuery, articleBySlugQuery, categoriesQuery } from "@/lib/sanity/queries";
 
@@ -68,8 +69,23 @@ function normalizeArticle(article: CmsArticle): NewsArticle {
 function normalizeVideo(video: CmsVideo): VideoStory {
   return {
     ...video,
+    source: video.source?.trim() || "Byte Bulletin",
     publishedAt: formatPublishDate(video.publishedAt),
   };
+}
+
+function uniqueVideos(videos: VideoStory[]) {
+  const seen = new Set<string>();
+
+  return videos.filter((video) => {
+    const key = video.youtubeUrl;
+    if (!key || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
 }
 
 const fetchCmsCategories = cache(async (): Promise<Category[]> => {
@@ -141,11 +157,14 @@ export async function getHomepageStories() {
 }
 
 export async function getHomepageVideos() {
-  const videos = await fetchCmsVideos();
+  const [cmsVideos, autoVideos] = await Promise.all([fetchCmsVideos(), fetchYouTubeNewsVideos(10)]);
+  const merged = uniqueVideos([...autoVideos, ...cmsVideos]);
+  const featuredVideo = cmsVideos.find((video) => video.featured) ?? merged[0] ?? getFeaturedVideo();
+  const latestVideos = uniqueVideos(merged.filter((video) => video.youtubeUrl !== featuredVideo.youtubeUrl)).slice(0, 3);
 
   return {
-    featuredVideo: videos.find((video) => video.featured) ?? videos[0] ?? getFeaturedVideo(),
-    latestVideos: videos.slice(0, 3),
+    featuredVideo,
+    latestVideos,
   };
 }
 
@@ -183,8 +202,14 @@ export async function getSearchStories() {
 }
 
 export async function getVideoStories() {
-  const videos = await fetchCmsVideos();
-  return videos.length > 0 ? videos : getLatestVideos(6);
+  const [cmsVideos, autoVideos] = await Promise.all([fetchCmsVideos(), fetchYouTubeNewsVideos(20)]);
+  const merged = uniqueVideos([...autoVideos, ...cmsVideos]);
+
+  if (merged.length > 0) {
+    return merged;
+  }
+
+  return getLatestVideos(6);
 }
 
 export async function getAllSlugs() {
