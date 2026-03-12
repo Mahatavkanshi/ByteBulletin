@@ -87,6 +87,7 @@ export default async function Home() {
       }),
     )
   ).filter((item) => item !== null);
+  const sidebarDeskPicks = latest.filter((story) => story.slug !== featured.slug).slice(0, 3);
   const featuredVideoEmbed = getYoutubeEmbedUrl(featuredVideo.youtubeUrl);
   const videoDeskBriefs = latestVideos.slice(0, 4);
   const liveUpdateImageFallbacks = [
@@ -303,6 +304,24 @@ export default async function Home() {
             <p className="mt-3 text-base leading-relaxed text-muted">
               Byte Bulletin is designed for readers who want depth without noise. Every piece is built for clarity, context and responsible reporting.
             </p>
+          </section>
+
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h3 className="text-2xl">Desk Picks</h3>
+            <div className="mt-4 space-y-4">
+              {sidebarDeskPicks.map((story) => (
+                <article key={`desk-pick-${story.slug}`} className="rounded-lg border border-border bg-background p-4">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-md border border-border">
+                    <Image src={resolveStoryImage(story)} alt={story.title} fill sizes="(max-width: 1280px) 100vw, 360px" className="object-cover" />
+                  </div>
+                  <h4 className="mt-3 text-xl leading-snug">{story.title}</h4>
+                  <p className="mt-2 text-sm text-muted">{story.publishedAt} | {story.readTime}</p>
+                  <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-sm font-semibold text-brand hover:underline">
+                    Read brief
+                  </Link>
+                </article>
+              ))}
+            </div>
           </section>
         </aside>
 
