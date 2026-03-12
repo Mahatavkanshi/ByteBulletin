@@ -109,10 +109,10 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
     .slice(0, 4);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-6 border-b border-border pb-4">
+    <main className="mx-auto max-w-[88rem] px-5 py-12 sm:px-7 lg:px-10">
+      <div className="mb-8 border-b border-border pb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Byte Bulletin</p>
-        <h1 className="mt-2 text-4xl">Video Bulletin</h1>
+        <h1 className="mt-2 text-5xl">Video Bulletin</h1>
         <p className="mt-2 text-muted">Television-style explainers auto-updated from selected YouTube news channels.</p>
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -154,7 +154,7 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
         </div>
       </div>
 
-      <section className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+      <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <article className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="aspect-video bg-[#1e3242]">
             {embedUrl ? (
@@ -169,11 +169,11 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
               <div className="flex h-full items-center justify-center text-sm font-semibold text-[#ecf5ff]">Video unavailable</div>
             )}
           </div>
-          <div className="p-5">
+          <div className="p-6 sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand">Featured</p>
-            <h2 className="mt-2 text-3xl leading-tight">{pageFeaturedVideo.title}</h2>
-            <p className="mt-2 text-sm text-muted">{pageFeaturedVideo.summary}</p>
-            <p className="mt-3 text-xs text-muted">
+            <h2 className="mt-3 text-4xl leading-tight">{pageFeaturedVideo.title}</h2>
+            <p className="mt-3 text-base text-muted">{pageFeaturedVideo.summary}</p>
+            <p className="mt-4 text-sm text-muted">
               {sourceLabel(pageFeaturedVideo)} | {categoryLabel(categoryKey(pageFeaturedVideo))} | Published {pageFeaturedVideo.publishedAt}
             </p>
             <a
@@ -187,12 +187,12 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
           </div>
         </article>
 
-        <aside className="space-y-4 rounded-xl border border-border bg-surface p-5">
-          <h3 className="text-xl">Quick Picks</h3>
+        <aside className="space-y-4 rounded-xl border border-border bg-surface p-6">
+          <h3 className="text-2xl">Quick Picks</h3>
           {quickPicks.map((video) => (
             <a key={video.slug} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="block border-b border-border pb-3 last:border-none">
-              <p className="text-sm font-semibold leading-snug">{video.title}</p>
-              <p className="mt-1 text-xs text-muted">
+              <p className="text-base font-semibold leading-snug">{video.title}</p>
+              <p className="mt-1 text-sm text-muted">
                 {sourceLabel(video)} | {categoryLabel(categoryKey(video))} | {video.publishedAt}
               </p>
             </a>
@@ -200,13 +200,13 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
         </aside>
       </section>
 
-      <section className="mt-10">
-        <h2 className="mb-4 border-b border-border pb-2 text-2xl">All Videos</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-12">
+        <h2 className="mb-4 border-b border-border pb-2 text-3xl">All Videos</h2>
+        <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visibleVideos.map((video) => {
             const thumbnail = getYoutubeThumbnailUrl(video.youtubeUrl);
             return (
-              <article key={video.slug} className="overflow-hidden rounded-lg border border-border bg-surface">
+              <article key={video.slug} className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface">
                 <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="block">
                   <div className="relative aspect-video bg-[#dae5ef]">
                     {thumbnail ? (
@@ -225,10 +225,10 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
                     </span>
                   </div>
                 </a>
-                <div className="p-4">
-                  <h3 className="text-lg leading-tight">{video.title}</h3>
-                  <p className="mt-2 text-sm text-muted">{video.summary}</p>
-                  <p className="mt-2 text-xs text-muted">
+                <div className="flex h-full flex-col p-6">
+                  <h3 className="text-2xl leading-tight">{video.title}</h3>
+                  <p className="mt-3 text-base text-muted">{video.summary}</p>
+                  <p className="mt-auto pt-4 text-sm text-muted">
                     {sourceLabel(video)} | {categoryLabel(categoryKey(video))} | {video.publishedAt}
                   </p>
                 </div>

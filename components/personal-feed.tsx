@@ -89,16 +89,15 @@ export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps)
   }, [stories, followedCategories, followedTopics]);
 
   return (
-    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-      <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
-        <h3 className="text-2xl">For You</h3>
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted">No login needed</span>
+    <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
+      <div className="flex items-center border-b border-border pb-3">
+        <h3 className="text-3xl">For You</h3>
       </div>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-5 space-y-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">Follow categories</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {categories.slice(0, 6).map((category) => {
               const active = followedCategories.includes(category.slug);
 
@@ -107,7 +106,7 @@ export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps)
                   key={category.slug}
                   type="button"
                   onClick={() => toggleCategory(category.slug)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wide ${
                     active ? "bg-brand text-brand-soft" : "border border-border text-muted"
                   }`}
                 >
@@ -120,7 +119,7 @@ export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps)
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">Follow topics</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {topics.slice(0, 6).map((topic) => {
               const active = followedTopics.includes(topic.slug);
 
@@ -129,7 +128,7 @@ export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps)
                   key={topic.slug}
                   type="button"
                   onClick={() => toggleTopic(topic.slug)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wide ${
                     active ? "bg-[#1e3242] text-[#ecf5ff]" : "border border-border text-muted"
                   }`}
                 >
@@ -140,17 +139,17 @@ export function PersonalFeed({ stories, categories, topics }: PersonalFeedProps)
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid auto-rows-fr gap-4">
           {filteredStories.length === 0 ? (
-            <p className="text-sm text-muted">Choose at least one category or topic to personalize your feed.</p>
+            <p className="text-base text-muted">Choose at least one category or topic to personalize your feed.</p>
           ) : (
             filteredStories.map((story) => (
-              <article key={story.slug} className="rounded-lg border border-border bg-background p-3">
+              <article key={story.slug} className="flex h-full flex-col rounded-lg border border-border bg-background p-5">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">{story.category}</p>
-                <h4 className="mt-1 text-lg leading-snug">{story.title}</h4>
-                <p className="mt-1 text-sm text-muted">{story.summary}</p>
-                <div className="mt-2 text-xs text-muted">{story.publishedAt}</div>
-                <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-sm font-semibold text-brand hover:underline">
+                <h4 className="mt-2 text-2xl leading-snug">{story.title}</h4>
+                <p className="mt-2 text-base text-muted">{story.summary}</p>
+                <div className="mt-3 text-sm text-muted">{story.publishedAt}</div>
+                <Link href={`/news/${story.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
                   Open story
                 </Link>
               </article>

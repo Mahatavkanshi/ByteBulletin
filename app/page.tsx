@@ -1,11 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PersonalFeed } from "@/components/personal-feed";
 import {
   getFactCheckStories,
   getHomepageStories,
   getHomepageVideos,
-  getPersonalizationSeed,
   getStoriesByCategory,
   getTopicCardsData,
 } from "@/lib/content";
@@ -18,14 +16,12 @@ export default async function Home() {
     { featuredVideo, latestVideos },
     factChecks,
     topicCards,
-    personalizationSeed,
     utilityWidgets,
   ] = await Promise.all([
     getHomepageStories(),
     getHomepageVideos(),
     getFactCheckStories(3),
     getTopicCardsData(3),
-    getPersonalizationSeed(),
     getUtilityWidgets(),
   ]);
   const today = new Date().toLocaleDateString("en-US", {
@@ -47,16 +43,16 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground news-grid-bg">
       <header className="border-b border-border bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[88rem] flex-col gap-5 px-5 py-6 sm:px-7 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
             <div>
               <p className="text-xs font-semibold tracking-[0.2em] text-brand">BYTE BULLETIN</p>
-              <h1 className="mt-1 text-4xl leading-none sm:text-5xl">News That Matters</h1>
+              <h1 className="mt-1 text-5xl leading-none sm:text-6xl">News That Matters</h1>
             </div>
-            <p className="text-sm text-muted">{today}</p>
+            <p className="text-base text-muted">{today}</p>
           </div>
 
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold uppercase tracking-wide text-[#33475b]">
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-base font-semibold uppercase tracking-wide text-[#33475b]">
             {categories.map((category) => (
               <Link key={category.slug} href={`/category/${category.slug}`} className="transition hover:text-brand">
                 {category.name}
@@ -78,8 +74,8 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="border-b border-border bg-brand px-4 py-2 text-brand-soft sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 overflow-hidden text-sm font-semibold">
+      <section className="border-b border-border bg-brand px-5 py-3 text-brand-soft sm:px-7 lg:px-10">
+        <div className="mx-auto flex max-w-[88rem] items-center gap-3 overflow-hidden text-sm font-semibold">
           <span className="rounded bg-brand-soft px-2 py-1 text-brand">Breaking</span>
           <div className="relative w-full overflow-hidden">
             <div className="ticker-track flex w-[200%] gap-8 whitespace-nowrap">
@@ -91,9 +87,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <main className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[2fr_1fr] lg:px-8">
-        <section className="reveal-up space-y-8">
-          <article className="rounded-xl border border-border bg-surface p-5 shadow-sm sm:p-7">
+      <main className="mx-auto grid max-w-[88rem] gap-10 px-5 py-10 sm:px-7 lg:grid-cols-[2fr_1fr] lg:px-10">
+        <section className="reveal-up space-y-10">
+          <article className="rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Lead Story</p>
             <h2 className="mt-3 text-3xl leading-tight sm:text-4xl">{featured.title}</h2>
             <p className="mt-4 max-w-3xl text-lg text-[#425668]">{featured.summary}</p>
@@ -114,36 +110,36 @@ export default async function Home() {
 
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
-              <h3 className="text-2xl">Latest Updates</h3>
+              <h3 className="text-3xl">Latest Updates</h3>
               <Link href="/category/national" className="text-sm font-semibold text-brand hover:underline">
                 View all
               </Link>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2">
               {liveUpdates.length > 0
                 ? liveUpdates.map((update) => (
-                    <article key={update.url} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                    <article key={update.url} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">Daily Wire</p>
-                      <h4 className="mt-2 text-xl leading-tight">{update.title}</h4>
-                      <p className="mt-2 text-sm text-muted">{update.description || "Read the full update from the source."}</p>
-                      <div className="mt-3 text-xs text-muted">{update.publishedAt || "Updated recently"}</div>
+                      <h4 className="mt-2 text-2xl leading-tight">{update.title}</h4>
+                      <p className="mt-3 text-base text-muted">{update.description || "Read the full update from the source."}</p>
+                      <div className="mt-4 text-sm text-muted">{update.publishedAt || "Updated recently"}</div>
                       <a
                         href={update.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
+                        className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline"
                       >
                         Read full update
                       </a>
                     </article>
                   ))
                 : latest.map((story) => (
-                    <article key={story.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                    <article key={story.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                       <p className="text-xs font-semibold uppercase tracking-widest text-brand">{story.category}</p>
-                      <h4 className="mt-2 text-xl leading-tight">{story.title}</h4>
-                      <p className="mt-2 text-sm text-muted">{story.summary}</p>
-                      <div className="mt-3 text-xs text-muted">{story.readTime}</div>
-                      <Link href={`/news/${story.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                      <h4 className="mt-2 text-2xl leading-tight">{story.title}</h4>
+                      <p className="mt-3 text-base text-muted">{story.summary}</p>
+                      <div className="mt-4 text-sm text-muted">{story.readTime}</div>
+                      <Link href={`/news/${story.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
                         Continue reading
                       </Link>
                     </article>
@@ -153,24 +149,24 @@ export default async function Home() {
 
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
-              <h3 className="text-2xl">Fact Check Lane</h3>
+              <h3 className="text-3xl">Fact Check Lane</h3>
               <Link href="/fact-check" className="text-sm font-semibold text-brand hover:underline">
                 View all checks
               </Link>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid auto-rows-fr gap-6 md:grid-cols-3">
               {factChecks.map((check) => (
-                <article key={check.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                <article key={check.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                   <div className="flex items-center justify-between gap-2">
                     <span className="rounded-full bg-[#1e3242] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ecf5ff]">
                       {check.verdict}
                     </span>
-                    <span className="text-xs text-muted">{check.publishedAt}</span>
+                    <span className="text-sm text-muted">{check.publishedAt}</span>
                   </div>
-                  <h4 className="mt-2 text-lg leading-tight">{check.title}</h4>
-                  <p className="mt-2 text-sm text-muted">{check.summary}</p>
-                  <p className="mt-2 text-xs text-muted">Claim: {check.claim}</p>
-                  <Link href="/fact-check" className="mt-2 inline-block text-sm font-semibold text-brand hover:underline">
+                  <h4 className="mt-3 text-2xl leading-tight">{check.title}</h4>
+                  <p className="mt-3 text-base text-muted">{check.summary}</p>
+                  <p className="mt-3 text-sm text-muted">Claim: {check.claim}</p>
+                  <Link href="/fact-check" className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
                     See evidence
                   </Link>
                 </article>
@@ -180,35 +176,32 @@ export default async function Home() {
 
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
-              <h3 className="text-2xl">Topic Timelines</h3>
+              <h3 className="text-3xl">Topic Timelines</h3>
               <Link href="/topics" className="text-sm font-semibold text-brand hover:underline">
                 Explore topics
               </Link>
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid auto-rows-fr gap-6 md:grid-cols-3">
               {topicCards.map((topic) => (
-                <article key={topic.slug} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                <article key={topic.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-wider text-brand">Ongoing Story</p>
-                  <h4 className="mt-2 text-xl leading-tight">{topic.name}</h4>
-                  <p className="mt-2 text-sm text-muted">{topic.summary}</p>
-                  <Link href={`/topic/${topic.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                  <h4 className="mt-2 text-2xl leading-tight">{topic.name}</h4>
+                  <p className="mt-3 text-base text-muted">{topic.summary}</p>
+                  <Link href={`/topic/${topic.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
                     Open timeline
                   </Link>
                 </article>
               ))}
             </div>
           </section>
-
-          <PersonalFeed stories={personalizationSeed.stories} categories={personalizationSeed.categories} topics={personalizationSeed.topics} />
-
           <section>
             <div className="mb-4 flex items-center justify-between border-b border-border pb-2">
-              <h3 className="text-2xl">Video Bulletin</h3>
+              <h3 className="text-3xl">Video Bulletin</h3>
               <Link href="/videos" className="text-sm font-semibold text-brand hover:underline">
                 Watch all
               </Link>
             </div>
-            <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
               <article className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
                 <div className="aspect-video bg-[#1e3242]">
                   {featuredVideoEmbed ? (
@@ -225,17 +218,17 @@ export default async function Home() {
                     </div>
                   )}
                 </div>
-                <div className="p-4 sm:p-5">
+                <div className="p-6 sm:p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-brand">Featured Video</p>
-                  <h4 className="mt-2 text-2xl leading-tight">{featuredVideo.title}</h4>
-                  <p className="mt-2 text-sm text-muted">{featuredVideo.summary}</p>
-                  <div className="mt-3 text-xs text-muted">
+                  <h4 className="mt-3 text-3xl leading-tight">{featuredVideo.title}</h4>
+                  <p className="mt-3 text-base text-muted">{featuredVideo.summary}</p>
+                  <div className="mt-4 text-sm text-muted">
                     {(featuredVideo.source || "Byte Bulletin") + " | " + featuredVideo.publishedAt}
                   </div>
                 </div>
               </article>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {latestVideos.slice(0, 3).map((video) => {
                   const thumbnail = getYoutubeThumbnailUrl(video.youtubeUrl);
                   return (
@@ -244,7 +237,7 @@ export default async function Home() {
                       href={video.youtubeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block rounded-lg border border-border bg-surface p-3 transition hover:shadow-sm"
+                      className="group block rounded-xl border border-border bg-surface p-5 transition hover:shadow-sm"
                     >
                       <div className="relative aspect-video overflow-hidden rounded-md bg-[#dae5ef]">
                         {thumbnail ? (
@@ -262,8 +255,8 @@ export default async function Home() {
                           Play
                         </span>
                       </div>
-                      <h4 className="mt-2 text-base leading-snug">{video.title}</h4>
-                      <p className="mt-1 text-xs text-muted">{(video.source || "Byte Bulletin") + " | " + video.publishedAt}</p>
+                      <h4 className="mt-3 text-xl leading-snug">{video.title}</h4>
+                      <p className="mt-2 text-sm text-muted">{(video.source || "Byte Bulletin") + " | " + video.publishedAt}</p>
                     </a>
                   );
                 })}
@@ -272,17 +265,17 @@ export default async function Home() {
           </section>
 
           <section>
-            <h3 className="mb-4 border-b border-border pb-2 text-2xl">Section Highlights</h3>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <h3 className="mb-4 border-b border-border pb-2 text-3xl">Section Highlights</h3>
+            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {sectionHighlights.map(({ category, story }) => {
                 return (
-                  <article key={category.slug} className="rounded-lg border border-border bg-surface p-4">
+                  <article key={category.slug} className="flex h-full flex-col rounded-xl border border-border bg-surface p-6">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: category.accent }}>
                       {category.name}
                     </p>
-                    <h4 className="mt-2 text-lg leading-tight">{story.title}</h4>
-                    <p className="mt-2 text-sm text-muted">{story.summary}</p>
-                    <Link href={`/category/${category.slug}`} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+                    <h4 className="mt-2 text-2xl leading-tight">{story.title}</h4>
+                    <p className="mt-3 text-base text-muted">{story.summary}</p>
+                    <Link href={`/category/${category.slug}`} className="mt-auto inline-block pt-4 text-base font-semibold text-brand hover:underline">
                       Explore {category.name}
                     </Link>
                   </article>
@@ -292,15 +285,15 @@ export default async function Home() {
           </section>
         </section>
 
-        <aside className="reveal-up space-y-6" style={{ animationDelay: "120ms" }}>
-          <section className="rounded-xl border border-border bg-surface p-5">
-            <h3 className="text-xl">Trending</h3>
+        <aside className="reveal-up space-y-8" style={{ animationDelay: "120ms" }}>
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h3 className="text-2xl">Trending</h3>
             <div className="mt-4 space-y-4">
               {trending.map((story, index) => (
                 <article key={story.slug} className="border-b border-border pb-3 last:border-none last:pb-0">
-                  <p className="text-xs font-semibold text-brand">0{index + 1}</p>
-                  <h4 className="mt-1 text-base leading-snug">{story.title}</h4>
-                  <Link href={`/news/${story.slug}`} className="mt-1 inline-block text-xs font-semibold uppercase tracking-wide text-muted hover:text-brand">
+                  <p className="text-sm font-semibold text-brand">0{index + 1}</p>
+                  <h4 className="mt-1 text-xl leading-snug">{story.title}</h4>
+                  <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-sm font-semibold uppercase tracking-wide text-muted hover:text-brand">
                     Read more
                   </Link>
                 </article>
@@ -308,57 +301,57 @@ export default async function Home() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-border bg-surface p-5">
+          <section className="rounded-xl border border-border bg-surface p-6">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-xl">City Utility</h3>
-              <span className="text-xs text-muted">{utilityWidgets.city}</span>
+              <h3 className="text-2xl">City Utility</h3>
+              <span className="text-sm text-muted">{utilityWidgets.city}</span>
             </div>
-            <div className="mt-4 space-y-3 text-sm">
+            <div className="mt-5 space-y-4 text-base">
               <div className="rounded-md border border-border p-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">Weather</p>
-                <p className="mt-1 text-base">
+                <p className="mt-1 text-lg">
                   {utilityWidgets.weather.temperatureC}C | {utilityWidgets.weather.condition}
                 </p>
-                <p className="text-xs text-muted">Wind {utilityWidgets.weather.windKph} km/h</p>
+                <p className="text-sm text-muted">Wind {utilityWidgets.weather.windKph} km/h</p>
               </div>
               <div className="rounded-md border border-border p-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">Air Quality</p>
-                <p className="mt-1 text-base">AQI {utilityWidgets.airQuality.aqi ?? "--"}</p>
-                <p className="text-xs text-muted">
+                <p className="mt-1 text-lg">AQI {utilityWidgets.airQuality.aqi ?? "--"}</p>
+                <p className="text-sm text-muted">
                   PM2.5 {utilityWidgets.airQuality.pm25 ?? "--"} | PM10 {utilityWidgets.airQuality.pm10 ?? "--"}
                 </p>
               </div>
               <div className="rounded-md border border-border p-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">INR FX</p>
-                <p className="mt-1 text-base">
+                <p className="mt-1 text-lg">
                   USD {utilityWidgets.forex.usd ?? "--"} | EUR {utilityWidgets.forex.eur ?? "--"}
                 </p>
-                <p className="text-xs text-muted">Updated {utilityWidgets.updatedAt}</p>
+                <p className="text-sm text-muted">Updated {utilityWidgets.updatedAt}</p>
               </div>
             </div>
           </section>
 
-          <section className="rounded-xl border border-border bg-[#1e3242] p-5 text-[#ecf5ff]">
+          <section className="rounded-xl border border-border bg-[#1e3242] p-6 text-[#ecf5ff]">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8bc2f5]">Newsletter</p>
-            <h3 className="mt-2 text-2xl">Get the Morning Brief</h3>
-            <p className="mt-2 text-sm text-[#d4e7f8]">
+            <h3 className="mt-2 text-3xl">Get the Morning Brief</h3>
+            <p className="mt-3 text-base text-[#d4e7f8]">
               Daily digest on policy, business and technology in under 5 minutes.
             </p>
-            <form className="mt-4 space-y-2">
+            <form className="mt-5 space-y-3">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full rounded-md border border-[#4f667b] bg-[#243d50] px-3 py-2 text-sm outline-none placeholder:text-[#a2c3df] focus:border-[#8bc2f5]"
+                className="w-full rounded-md border border-[#4f667b] bg-[#243d50] px-4 py-3 text-base outline-none placeholder:text-[#a2c3df] focus:border-[#8bc2f5]"
               />
-              <button type="submit" className="w-full rounded-md bg-[#8bc2f5] px-3 py-2 text-sm font-semibold text-[#163148]">
+              <button type="submit" className="w-full rounded-md bg-[#8bc2f5] px-4 py-3 text-base font-semibold text-[#163148]">
                 Subscribe Free
               </button>
             </form>
           </section>
 
-          <section className="rounded-xl border border-border bg-surface p-5">
-            <h3 className="text-xl">Editor&apos;s Note</h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h3 className="text-2xl">Editor&apos;s Note</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted">
               Byte Bulletin is designed for readers who want depth without noise. Every piece is built for clarity, context and responsible reporting.
             </p>
           </section>

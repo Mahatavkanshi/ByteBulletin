@@ -53,14 +53,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
   const sourceLinks = article.sourceLinks ?? [];
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <article className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+    <main className="mx-auto max-w-[88rem] px-5 py-12 sm:px-7 lg:px-10">
+      <article className="grid gap-10 lg:grid-cols-[2fr_1fr]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
             {category?.name ?? "News"}
           </p>
-          <h1 className="mt-3 text-4xl leading-tight sm:text-5xl">{article.title}</h1>
-          <p className="mt-4 text-lg text-[#425668]">{article.summary}</p>
+          <h1 className="mt-3 text-5xl leading-tight sm:text-6xl">{article.title}</h1>
+          <p className="mt-4 text-xl text-[#425668]">{article.summary}</p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm text-muted">
             <span>{article.author}</span>
             <span>|</span>
@@ -76,47 +76,47 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </Link>
           ) : null}
 
-          <div className="mt-7 h-64 rounded-xl border border-border bg-gradient-to-br from-[#f7dfdb] via-[#f5ede3] to-[#dce9f5]" />
+          <div className="mt-8 h-72 rounded-xl border border-border bg-gradient-to-br from-[#f7dfdb] via-[#f5ede3] to-[#dce9f5]" />
 
-          <section className="mt-8 rounded-xl border border-border bg-surface p-5">
+          <section className="mt-10 rounded-xl border border-border bg-surface p-6 sm:p-7">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-2xl">Context and Trust</h2>
-              <span className="text-xs text-muted">{article.lastVerified || "Verification in progress"}</span>
+              <h2 className="text-3xl">Context and Trust</h2>
+              <span className="text-sm text-muted">{article.lastVerified || "Verification in progress"}</span>
             </div>
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-border p-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-3">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">Why it matters</p>
-                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                <ul className="mt-2 space-y-1 text-base text-[#2d4152]">
                   {whyItMatters.length > 0 ? whyItMatters.map((point) => <li key={point}>- {point}</li>) : <li>- Context update will be added by the desk.</li>}
                 </ul>
               </div>
-              <div className="rounded-lg border border-border p-3">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">What changed</p>
-                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                <ul className="mt-2 space-y-1 text-base text-[#2d4152]">
                   {whatChanged.length > 0 ? whatChanged.map((point) => <li key={point}>- {point}</li>) : <li>- New developments are being tracked.</li>}
                 </ul>
               </div>
-              <div className="rounded-lg border border-border p-3">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">What next</p>
-                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                <ul className="mt-2 space-y-1 text-base text-[#2d4152]">
                   {whatNext.length > 0 ? whatNext.map((point) => <li key={point}>- {point}</li>) : <li>- Follow this story for official updates.</li>}
                 </ul>
               </div>
             </div>
 
-            <div className="mt-4 grid gap-4 md:grid-cols-[1.4fr_1fr]">
-              <div className="rounded-lg border border-border p-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-[1.4fr_1fr]">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">Read in 60 sec</p>
-                <ul className="mt-2 space-y-1 text-sm text-[#2d4152]">
+                <ul className="mt-2 space-y-1 text-base text-[#2d4152]">
                   {quickBrief.length > 0 ? quickBrief.map((point) => <li key={point}>- {point}</li>) : <li>- Brief points will be published shortly.</li>}
                 </ul>
                 <div className="mt-3">
                   <ArticleAudio title={article.title} summary={article.summary} brief={quickBrief} content={article.content} />
                 </div>
               </div>
-              <div className="rounded-lg border border-border p-3">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-brand">Sources</p>
-                <div className="mt-2 space-y-1 text-sm">
+                <div className="mt-2 space-y-2 text-base">
                   {sourceLinks.length > 0 ? (
                     sourceLinks.map((source) => (
                       <a
@@ -137,24 +137,24 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </section>
 
-          <div className="mt-8 space-y-5 text-lg leading-relaxed text-[#213242]">
-            {article.content.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
+            <div className="mt-10 space-y-6 text-xl leading-relaxed text-[#213242]">
+              {article.content.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
         </div>
 
-        <aside className="space-y-5">
-          <section className="rounded-xl border border-border bg-surface p-5">
-            <h2 className="text-2xl">More in this section</h2>
+        <aside className="space-y-6">
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h2 className="text-3xl">More in this section</h2>
             <div className="mt-4 space-y-4">
               {relatedStories.length === 0 ? (
-                <p className="text-sm text-muted">More stories are coming soon.</p>
+                <p className="text-base text-muted">More stories are coming soon.</p>
               ) : (
                 relatedStories.map((story) => (
                   <article key={story.slug} className="border-b border-border pb-3 last:border-none last:pb-0">
-                    <h3 className="text-base leading-snug">{story.title}</h3>
-                    <Link href={`/news/${story.slug}`} className="mt-1 inline-block text-sm font-semibold text-brand hover:underline">
+                    <h3 className="text-xl leading-snug">{story.title}</h3>
+                    <Link href={`/news/${story.slug}`} className="mt-2 inline-block text-base font-semibold text-brand hover:underline">
                       Read this story
                     </Link>
                   </article>
@@ -163,12 +163,12 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </div>
           </section>
 
-          <section className="rounded-xl border border-border bg-surface p-5">
-            <h2 className="text-xl">Follow Byte Bulletin</h2>
-            <p className="mt-2 text-sm text-muted">
+          <section className="rounded-xl border border-border bg-surface p-6">
+            <h2 className="text-2xl">Follow Byte Bulletin</h2>
+            <p className="mt-3 text-base text-muted">
               Get verified updates every morning and evening with zero paywall.
             </p>
-            <Link href="/" className="mt-3 inline-block rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-soft">
+            <Link href="/" className="mt-4 inline-block rounded-full bg-brand px-5 py-2.5 text-base font-semibold text-brand-soft">
               Go to homepage
             </Link>
           </section>
