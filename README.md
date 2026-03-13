@@ -22,29 +22,17 @@ Byte Bulletin is an India-first, free-resource news platform built with Next.js.
 
 ## Screenshots
 
-### Homepage
+| Homepage | Latest Updates |
+| --- | --- |
+| <img src="./app/images/news.png" alt="Byte Bulletin Homepage" width="100%" /> | <img src="./app/images/latestupdates.png" alt="Latest Updates Section" width="100%" /> |
 
-![Byte Bulletin Homepage](app/images/news.png)
+| Fact Check Lane | Video Bulletin |
+| --- | --- |
+| <img src="./app/images/facts.png" alt="Fact Check Lane" width="100%" /> | <img src="./app/images/videonews.png" alt="Video Bulletin" width="100%" /> |
 
-### Latest Updates
-
-![Latest Updates Section](app/images/latestupdates.png)
-
-### Fact Check Lane
-
-![Fact Check Lane](app/images/facts.png)
-
-### Video Bulletin
-
-![Video Bulletin](app/images/videonews.png)
-
-### City Utility
-
-![City Utility Section](app/images/city.png)
-
-### Newsletter Panel
-
-![Newsletter Panel](app/images/newsletter.png)
+| City Utility | Newsletter Panel |
+| --- | --- |
+| <img src="./app/images/city.png" alt="City Utility Section" width="100%" /> | <img src="./app/images/newsletter.png" alt="Newsletter Panel" width="100%" /> |
 
 ## Tech Stack
 
