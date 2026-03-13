@@ -20,6 +20,32 @@ Byte Bulletin is an India-first, free-resource news platform built with Next.js.
 - Daily Briefs (Morning + Evening), Explainer card, and local saved stories
 - Utility widgets (weather, AQI, INR forex)
 
+## Screenshots
+
+### Homepage
+
+![Byte Bulletin Homepage](app/images/news.png)
+
+### Latest Updates
+
+![Latest Updates Section](app/images/latestupdates.png)
+
+### Fact Check Lane
+
+![Fact Check Lane](app/images/facts.png)
+
+### Video Bulletin
+
+![Video Bulletin](app/images/videonews.png)
+
+### City Utility
+
+![City Utility Section](app/images/city.png)
+
+### Newsletter Panel
+
+![Newsletter Panel](app/images/newsletter.png)
+
 ## Tech Stack
 
 - Next.js 16 (App Router + TypeScript)
